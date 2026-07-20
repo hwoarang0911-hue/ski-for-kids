@@ -43,10 +43,67 @@ export function recommendSkiLength(heightCm: number, level: SkillLevel): SkiLeng
   }
 }
 
+/**
+ * 상세 스키 길이: 키·실력 기본 범위(recommendSkiLength)에 체중(BMI)과 턴 성향을
+ * 반영해 범위 안에서 추천 지점을 잡는다. (PSIA·evo 사이징 가이드 기반)
+ */
+export type TurnStyle = 'short' | 'all' | 'long';
+
+export interface RefinedSkiLength {
+  min: number;
+  max: number;
+  recommended: number;
+  factors: string[];
+}
+
+export function refineSkiLength(
+  heightCm: number,
+  weightKg: number | undefined,
+  level: SkillLevel,
+  turnStyle: TurnStyle,
+): RefinedSkiLength {
+  const base = recommendSkiLength(heightCm, level);
+  let pos = 0.5;
+  const factors: string[] = [];
+
+  if (turnStyle === 'short') {
+    pos -= 0.2;
+    factors.push('숏턴·초보 슬로프 위주 → 짧은 쪽');
+  } else if (turnStyle === 'long') {
+    pos += 0.2;
+    factors.push('고속·롱턴·파우더 위주 → 긴 쪽');
+  }
+
+  if (weightKg && heightCm) {
+    const bmi = weightKg / Math.pow(heightCm / 100, 2);
+    if (bmi >= 24) {
+      pos += 0.15;
+      factors.push('키에 비해 체중이 있는 편 → 안정감 위해 긴 쪽');
+    } else if (bmi <= 16.5) {
+      pos -= 0.15;
+      factors.push('키에 비해 가벼운 편 → 조작 쉽게 짧은 쪽');
+    }
+  }
+
+  pos = Math.max(0, Math.min(1, pos));
+  const recommended = Math.round(base.min + pos * (base.max - base.min));
+  return { min: Math.round(base.min), max: Math.round(base.max), recommended, factors };
+}
+
 // ── 폴 길이 ──────────────────────────────────────────────────
 /** 키 × 0.69를 5cm 단위로 반올림. 팔꿈치 90도와 거의 같다. */
 export function recommendPoleLength(heightCm: number): number {
   return Math.round((heightCm * 0.69) / 5) * 5;
+}
+
+export type PoleDiscipline = 'all' | 'short' | 'long';
+
+/** 종목 성향에 따른 폴 길이 보정: 모굴·숏턴은 짧게, 레이싱·롱턴은 길게 */
+export function refinePoleLength(heightCm: number, discipline: PoleDiscipline): number {
+  const base = recommendPoleLength(heightCm);
+  if (discipline === 'short') return base - 5;
+  if (discipline === 'long') return base + 5;
+  return base;
 }
 
 // ── DIN (ISO 11088 간이표) ──────────────────────────────────
