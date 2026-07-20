@@ -6,7 +6,8 @@ export type ResourceCategory =
   | '아이에게 스키 가르치기'
   | '유아(3~6세) 스킹'
   | '가족 스키 여행 노하우'
-  | '부모용 심화 자료';
+  | '부모용 심화 자료'
+  | '공식 안전 캠페인·기관 자료';
 
 export interface LearningResource {
   id: string;
@@ -25,6 +26,7 @@ export const RESOURCE_CATEGORIES: ResourceCategory[] = [
   '유아(3~6세) 스킹',
   '가족 스키 여행 노하우',
   '부모용 심화 자료',
+  '공식 안전 캠페인·기관 자료',
 ];
 
 export const RESOURCES: LearningResource[] = [
@@ -181,5 +183,52 @@ export const RESOURCES: LearningResource[] = [
     language: '영어',
     type: '글',
     url: 'https://www.skinewgen.com/ski-blog/skiing-with-kids/teaching-kids-to-ski-101-for-trainees-and-parents/',
+  },
+
+  // ── 공식 안전 캠페인·기관 자료 ────────────────────────────
+  {
+    id: 'org-responsibility-code',
+    category: '공식 안전 캠페인·기관 자료',
+    title: 'Your Responsibility Code — 미국 스키장 책임 규칙 (NSAA)',
+    summary: '미국스키장협회의 공식 슬로프 안전 규칙 10개항(2022 개정). 이 앱 안전 탭 규칙의 원문이에요.',
+    language: '영어',
+    type: '글',
+    url: 'https://skisafety.us/your-responsibility-code',
+  },
+  {
+    id: 'org-lift-safety',
+    category: '공식 안전 캠페인·기관 자료',
+    title: '리프트 안전 가이드 (NSAA Ski Safety)',
+    summary: '어린이 리프트 탑승 규정(어른 동반, 안전바, 아기띠 금지 등)을 포함한 공식 리프트 안전 안내.',
+    language: '영어',
+    type: '글',
+    url: 'https://skisafety.us/lift-safety',
+  },
+  {
+    id: 'org-park-smart',
+    category: '공식 안전 캠페인·기관 자료',
+    title: '터레인파크 안전 — Park SMART (NSAA)',
+    summary: '점프대·레일이 있는 파크 이용 5원칙(작게 시작, 계획, 확인, 존중, 무리 금지) 공식 캠페인.',
+    language: '영어',
+    type: '글',
+    url: 'https://skisafety.us/terrain-park-safety',
+  },
+  {
+    id: 'org-aap',
+    category: '공식 안전 캠페인·기관 자료',
+    title: '어린이 스키·스노보드 안전 (미국소아과학회 HealthyChildren)',
+    summary: '소아과 의사들이 정리한 어린이 겨울스포츠 안전 수칙. 버디 시스템, 보호 장비, 연령 권고의 출처.',
+    language: '영어',
+    type: '글',
+    url: 'https://www.healthychildren.org/English/healthy-living/sports/Pages/Skiing-and-Snowboarding.aspx',
+  },
+  {
+    id: 'org-psia-field-guide',
+    category: '공식 안전 캠페인·기관 자료',
+    title: 'Teaching Children Snowsports 필드 가이드 (PSIA-AASI)',
+    summary: '미국 스키강사협회의 어린이 티칭 공식 교재. 레벨별 게임·드릴 140개 수록 — 이 앱 로드맵의 참고 자료.',
+    language: '영어',
+    type: '글',
+    url: 'https://www.thesnowpros.org/2023/11/07/available-now-teaching-children-snowsports-alpine-field-guide/',
   },
 ];

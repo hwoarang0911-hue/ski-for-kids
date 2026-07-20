@@ -18,6 +18,7 @@ export function SafetyPage() {
               <p>{item.body}</p>
             </div>
           ))}
+          {section.source && <p className="source-note">참고: {section.source}</p>}
         </Accordion>
       ))}
     </div>
