@@ -888,15 +888,24 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 5px 0;
+  padding: 9px 0;
+}
+
+.rec-row + .rec-row {
+  border-top: 1px solid #edf2fb;
 }
 
 .rec-key {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  font-size: 0.88rem;
+  gap: 7px;
+  font-size: 1rem;
   color: var(--ink-soft);
+}
+
+.rec-key svg {
+  width: 19px;
+  height: 19px;
 }
 
 .rec-key svg {
@@ -904,9 +913,10 @@ body {
 }
 
 .rec-val {
-  font-size: 0.95rem;
-  font-weight: 700;
-  color: var(--ink);
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--brand);
+  letter-spacing: -0.3px;
 }
 
 .rec-notes {
