@@ -3,13 +3,15 @@ import { HomePage } from './pages/HomePage';
 import { GearPage } from './pages/GearPage';
 import { SafetyPage } from './pages/SafetyPage';
 import { LearnPage } from './pages/LearnPage';
+import { ChecklistPage } from './pages/ChecklistPage';
 
-type TabId = 'home' | 'gear' | 'safety' | 'learn';
+type TabId = 'home' | 'gear' | 'safety' | 'check' | 'learn';
 
 const TABS: { id: TabId; label: string; emoji: string }[] = [
   { id: 'home', label: '홈', emoji: '⛷️' },
   { id: 'gear', label: '장비', emoji: '🎿' },
   { id: 'safety', label: '안전', emoji: '🛟' },
+  { id: 'check', label: '준비', emoji: '✅' },
   { id: 'learn', label: '배움터', emoji: '📚' },
 ];
 
@@ -26,6 +28,7 @@ export default function App() {
         {tab === 'home' && <HomePage />}
         {tab === 'gear' && <GearPage />}
         {tab === 'safety' && <SafetyPage />}
+        {tab === 'check' && <ChecklistPage />}
         {tab === 'learn' && <LearnPage />}
       </main>
 

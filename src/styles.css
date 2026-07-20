@@ -637,6 +637,104 @@ body {
   color: var(--ink-soft);
 }
 
+/* ── 가족 정보 카드 ────────────────────── */
+.family-card {
+  border: 1.5px solid var(--brand-soft);
+}
+
+.family-link {
+  display: block;
+  text-align: center;
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-decoration: none;
+  border-radius: 12px;
+  padding: 11px;
+  margin-top: 6px;
+}
+
+/* ── 체크리스트 ───────────────────────── */
+.progress-card {
+  padding: 14px 16px;
+}
+
+.progress-label {
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+  margin-bottom: 8px;
+}
+
+.progress-label strong {
+  color: var(--brand);
+  font-size: 1rem;
+}
+
+.progress-track {
+  height: 10px;
+  background: var(--dial-track);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--brand), #6fa1ff);
+  border-radius: 999px;
+  transition: width 0.25s ease;
+}
+
+.check-list {
+  list-style: none;
+}
+
+.check-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 9px 4px;
+  border-bottom: 1px solid #f0f4fb;
+  cursor: pointer;
+}
+
+.check-row input {
+  width: 20px;
+  height: 20px;
+  margin-top: 2px;
+  accent-color: var(--brand);
+  flex-shrink: 0;
+}
+
+.check-text {
+  font-size: 0.93rem;
+}
+
+.check-text small {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+}
+
+.check-row.done .check-text {
+  color: var(--ink-soft);
+  text-decoration: line-through;
+}
+
+.check-row.done .check-text small {
+  text-decoration: none;
+}
+
+.reset-btn {
+  margin-top: 10px;
+  border: 1.5px solid var(--brand-soft);
+  background: none;
+  color: var(--ink-soft);
+  font-size: 0.82rem;
+  padding: 7px 14px;
+  border-radius: 999px;
+}
+
 /* ── 하단 탭바 ─────────────────────────── */
 .tab-bar {
   position: fixed;

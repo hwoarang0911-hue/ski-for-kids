@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { RESORTS, DEFAULT_RESORT_ID } from '../data/resorts';
+import { RESORT_FAMILY } from '../data/resortFamily';
 import { fetchWeather, type ResortWeather } from '../lib/weather';
 import { estimateSnowCondition } from '../lib/snowCondition';
 import { computeSkiIndex } from '../lib/skiIndex';
@@ -127,6 +128,40 @@ export function HomePage() {
               <TipCard key={tip.id} tip={tip} />
             ))}
           </div>
+
+          {RESORT_FAMILY[resort.id] && (
+            <div className="card family-card">
+              <h3 className="card-title">👨‍👩‍👧 {resort.name} 가족 정보</h3>
+              <div className="content-item">
+                <h4>🎿 초보·어린이 슬로프</h4>
+                <p>{RESORT_FAMILY[resort.id].beginner}</p>
+              </div>
+              {RESORT_FAMILY[resort.id].kids && (
+                <div className="content-item">
+                  <h4>🛷 키즈·눈놀이</h4>
+                  <p>{RESORT_FAMILY[resort.id].kids}</p>
+                </div>
+              )}
+              {RESORT_FAMILY[resort.id].lesson && (
+                <div className="content-item">
+                  <h4>🧑‍🏫 어린이 강습</h4>
+                  <p>{RESORT_FAMILY[resort.id].lesson}</p>
+                </div>
+              )}
+              <div className="content-item">
+                <h4>💬 가족 팁</h4>
+                <p>{RESORT_FAMILY[resort.id].tip}</p>
+              </div>
+              <a
+                className="family-link"
+                href={RESORT_FAMILY[resort.id].website}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                공식 홈페이지에서 운영·요금 확인하기 →
+              </a>
+            </div>
+          )}
 
           <p className="data-note">
             날씨 데이터: Open-Meteo · 슬로프 베이스 고도({resort.baseElevation}m) 기준 ·{' '}

@@ -1,3 +1,16 @@
+export interface ResortFamilyInfo {
+  /** 초보·어린이가 타기 좋은 슬로프/구역 */
+  beginner: string;
+  /** 눈썰매장·키즈파크 등 */
+  kids?: string;
+  /** 어린이 강습 */
+  lesson?: string;
+  /** 가족 관점 한 줄 팁 */
+  tip: string;
+  /** 공식 홈페이지 (최신 요금·운영 정보 확인용) */
+  website: string;
+}
+
 export interface Resort {
   id: string;
   name: string;
