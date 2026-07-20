@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { FamilyMember, Relation } from '../lib/account';
-import { SKILL_LABELS, type SkillLevel } from '../lib/recommend';
+import { SKILL_LABELS, STYLE_LABELS, type SkillLevel, type SkierStyle } from '../lib/recommend';
 
 const RELATIONS: Relation[] = ['본인', '배우자', '자녀', '부모', '기타'];
 const LEVELS = Object.keys(SKILL_LABELS) as SkillLevel[];
@@ -21,7 +21,7 @@ export function MemberForm({ initial, onSubmit, onCancel }: Props) {
   const [heightCm, setHeightCm] = useState(initial?.heightCm ? String(initial.heightCm) : '');
   const [weightKg, setWeightKg] = useState(initial?.weightKg ? String(initial.weightKg) : '');
   const [level, setLevel] = useState<SkillLevel>(initial?.level ?? 'first');
-  const [bootSoleMm, setBootSoleMm] = useState(initial?.bootSoleMm ? String(initial.bootSoleMm) : '');
+  const [style, setStyle] = useState<SkierStyle | ''>(initial?.style ?? '');
 
   const h = parseFloat(heightCm);
   const w = parseFloat(weightKg);
@@ -39,8 +39,7 @@ export function MemberForm({ initial, onSubmit, onCancel }: Props) {
     if (gender) draft.gender = gender;
     const by = parseInt(birthYear, 10);
     if (!Number.isNaN(by) && by > 1900 && by <= new Date().getFullYear()) draft.birthYear = by;
-    const sole = parseFloat(bootSoleMm);
-    if (!Number.isNaN(sole) && sole >= 180 && sole <= 400) draft.bootSoleMm = sole;
+    if (style !== '') draft.style = style;
     onSubmit(draft);
   };
 
@@ -81,26 +80,31 @@ export function MemberForm({ initial, onSubmit, onCancel }: Props) {
         </div>
       </div>
 
-      <div className="calc-row">
-        <label htmlFor="mf-level">스키 실력</label>
-        <select id="mf-level" value={level} onChange={(e) => setLevel(e.target.value as SkillLevel)}>
-          {LEVELS.map((l) => (
-            <option key={l} value={l}>{SKILL_LABELS[l]}</option>
-          ))}
-        </select>
-      </div>
-
       <div className="form-2col">
         <div className="calc-row">
-          <label htmlFor="mf-birth">출생연도(선택)</label>
-          <input id="mf-birth" type="number" inputMode="numeric" value={birthYear} onChange={(e) => setBirthYear(e.target.value)} placeholder="2017" />
+          <label htmlFor="mf-level">스키 경험</label>
+          <select id="mf-level" value={level} onChange={(e) => setLevel(e.target.value as SkillLevel)}>
+            {LEVELS.map((l) => (
+              <option key={l} value={l}>{SKILL_LABELS[l]}</option>
+            ))}
+          </select>
         </div>
         <div className="calc-row">
-          <label htmlFor="mf-sole">부츠 밑창 mm(선택)</label>
-          <input id="mf-sole" type="number" inputMode="decimal" value={bootSoleMm} onChange={(e) => setBootSoleMm(e.target.value)} placeholder="245" />
+          <label htmlFor="mf-style">스키 스타일</label>
+          <select id="mf-style" value={style} onChange={(e) => setStyle(e.target.value === '' ? '' : (Number(e.target.value) as SkierStyle))}>
+            <option value="">실력에 맞춤(자동)</option>
+            <option value={1}>{STYLE_LABELS[1]}</option>
+            <option value={2}>{STYLE_LABELS[2]}</option>
+            <option value={3}>{STYLE_LABELS[3]}</option>
+          </select>
         </div>
       </div>
-      <p className="form-hint">출생연도·부츠 밑창은 DIN 정확도를 높여줘요(선택 입력).</p>
+
+      <div className="calc-row">
+        <label htmlFor="mf-birth">출생연도(선택)</label>
+        <input id="mf-birth" type="number" inputMode="numeric" value={birthYear} onChange={(e) => setBirthYear(e.target.value)} placeholder="2017" />
+      </div>
+      <p className="form-hint">스키 스타일은 DIN(이탈값) 참고치에, 출생연도는 어린이·고령 보정에 쓰여요.</p>
 
       <div className="form-actions">
         <button className="btn-ghost" onClick={onCancel}>취소</button>

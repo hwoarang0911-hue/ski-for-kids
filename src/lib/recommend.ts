@@ -125,3 +125,18 @@ export function styleFromLevel(level: SkillLevel): SkierStyle {
   if (level === 'intermediate') return 2;
   return 1;
 }
+
+export const STYLE_LABELS: Record<SkierStyle, string> = {
+  1: '천천히·조심조심',
+  2: '보통 속도',
+  3: '빠르고 공격적',
+};
+
+/**
+ * 부츠 밑창 길이(mm)를 키로 추정한다.
+ * 발 길이 ≈ 키 × 0.15, 부츠 밑창 ≈ 발 길이 + 셸 여유(약 20mm).
+ * 사용자가 밑창 길이를 직접 재지 않아도 DIN 참고값을 낼 수 있게 한다.
+ */
+export function estimateSoleMm(heightCm: number): number {
+  return Math.round(Math.min(360, Math.max(180, heightCm * 1.5 + 20)));
+}

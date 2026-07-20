@@ -12,8 +12,6 @@ export interface FamilyMember {
   heightCm: number;
   weightKg: number;
   level: SkillLevel;
-  /** 부츠 밑창 길이(mm) — DIN 계산에 쓰임(선택) */
-  bootSoleMm?: number;
   /** 스키어 스타일 수동 지정(선택). 없으면 실력에서 유추 */
   style?: SkierStyle;
 }

@@ -4,7 +4,9 @@ import {
   recommendSkiLength,
   recommendPoleLength,
   recommendDin,
+  estimateSoleMm,
   styleFromLevel,
+  STYLE_LABELS,
 } from '../lib/recommend';
 import { Icon } from '../lib/icons';
 
@@ -16,11 +18,9 @@ export function MemberRecommendation({ member }: { member: FamilyMember }) {
     const style = member.style ?? styleFromLevel(member.level);
     const age = member.birthYear ? new Date().getFullYear() - member.birthYear : undefined;
     const youngOrOld = age !== undefined ? age < 10 || age >= 50 : member.heightCm < 140;
-    const din =
-      member.bootSoleMm && member.bootSoleMm >= 180
-        ? recommendDin(member.weightKg, member.heightCm, member.bootSoleMm, style, youngOrOld)
-        : null;
-    return { ski, pole, din, needSole: !member.bootSoleMm };
+    const sole = estimateSoleMm(member.heightCm);
+    const din = recommendDin(member.weightKg, member.heightCm, sole, style, youngOrOld);
+    return { ski, pole, din, style };
   }, [member]);
 
   return (
@@ -40,10 +40,9 @@ export function MemberRecommendation({ member }: { member: FamilyMember }) {
 
       <div className="rec-row">
         <span className="rec-key"><Icon name="din" /> DIN 참고값</span>
-        <span className="rec-val">
-          {rec.din !== null ? rec.din.toFixed(2) : rec.needSole ? '부츠 밑창 길이 입력 필요' : '표 범위 밖'}
-        </span>
+        <span className="rec-val">{rec.din !== null ? rec.din.toFixed(2) : '샵 상담'}</span>
       </div>
+      <p className="rec-note">스타일: {STYLE_LABELS[rec.style]} · 밑창 길이는 키로 자동 추정</p>
       <p className="rec-disclaimer">
         DIN은 참고용이에요. 실제 조정은 반드시 장비샵에서 받으세요.
       </p>
