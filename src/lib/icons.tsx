@@ -59,6 +59,8 @@ import {
   LuPizza,
   LuRotateCw,
   LuCableCar,
+  LuRoute,
+  LuOctagon,
   LuSkull,
 } from 'react-icons/lu';
 import { TbSnowboarding as TbSki } from 'react-icons/tb';
@@ -94,7 +96,13 @@ export const iconMap: Record<string, IconType> = {
   weather: LuThermometer,
   injury: LuBandage,
   park: LuMountainSnow,
+  terrain: LuRoute,
   emergency: LuLifeBuoy,
+
+  // 배움터 기술 개념
+  turnPurpose: LuRotateCw,
+  hockeystop: LuOctagon,
+  carving: TbSki,
 
   // 체크리스트 그룹
   season: LuCalendarDays,

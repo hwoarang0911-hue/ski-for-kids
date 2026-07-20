@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { TIPS, type TipCategory } from '../data/tips';
 import { RESOURCES, RESOURCE_CATEGORIES } from '../data/resources';
 import { TEACHING_INTRO, TEACHING_STAGES } from '../data/teachingGuide';
+import { TECHNIQUE_SECTIONS } from '../data/technique';
 import { TipCard } from '../components/TipCard';
 import { ResourceCard } from '../components/ResourceCard';
 import { Accordion } from '../components/Accordion';
@@ -10,7 +11,7 @@ import { Icon } from '../lib/icons';
 const TIP_CATEGORIES: TipCategory[] = ['날씨·설질', '아이와 함께', '장비', '안전', '재미'];
 
 export function LearnPage() {
-  const [tab, setTab] = useState<'teach' | 'tips' | 'resources'>('teach');
+  const [tab, setTab] = useState<'teach' | 'technique' | 'tips' | 'resources'>('teach');
   const [tipCategory, setTipCategory] = useState<TipCategory | '전체'>('전체');
 
   const visibleTips = tipCategory === '전체' ? TIPS : TIPS.filter((t) => t.category === tipCategory);
@@ -20,9 +21,31 @@ export function LearnPage() {
       <h2 className="page-title">배움터</h2>
       <div className="segment">
         <button className={tab === 'teach' ? 'active' : ''} onClick={() => setTab('teach')}>가르치기</button>
+        <button className={tab === 'technique' ? 'active' : ''} onClick={() => setTab('technique')}>기술</button>
         <button className={tab === 'tips' ? 'active' : ''} onClick={() => setTab('tips')}>팁 모음</button>
         <button className={tab === 'resources' ? 'active' : ''} onClick={() => setTab('resources')}>자료실</button>
       </div>
+
+      {tab === 'technique' && (
+        <>
+          <p className="page-intro">
+            기술을 완벽하게 배우기보다, "왜 그렇게 하는지"를 이해하면 스키가 안전하고
+            즐거워져요. 슬로프에서 길을 읽는 법은 안전 탭의 「슬로프 읽기」도 함께 보세요.
+          </p>
+          {TECHNIQUE_SECTIONS.map((section, i) => (
+            <Accordion key={section.id} icon={section.icon} title={section.title} defaultOpen={i === 0}>
+              {section.intro && <p className="section-intro">{section.intro}</p>}
+              {section.items.map((item) => (
+                <div className="content-item" key={item.heading}>
+                  <h4>{item.heading}</h4>
+                  <p>{item.body}</p>
+                </div>
+              ))}
+              {section.source && <p className="source-note">참고: {section.source}</p>}
+            </Accordion>
+          ))}
+        </>
+      )}
 
       {tab === 'teach' && (
         <>
