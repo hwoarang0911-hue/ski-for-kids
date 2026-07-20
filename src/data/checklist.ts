@@ -11,7 +11,6 @@ export interface ChecklistItem {
 
 export interface ChecklistGroup {
   id: string;
-  emoji: string;
   title: string;
   intro?: string;
   items: ChecklistItem[];
@@ -20,7 +19,6 @@ export interface ChecklistGroup {
 export const CHECKLIST_GROUPS: ChecklistGroup[] = [
   {
     id: 'season',
-    emoji: '🗓️',
     title: '시즌 시작 전 (11~12월)',
     intro: '첫 스키 가기 1~2주 전에 한 번만 해두면 시즌 내내 편해요.',
     items: [
@@ -36,7 +34,6 @@ export const CHECKLIST_GROUPS: ChecklistGroup[] = [
   },
   {
     id: 'pack',
-    emoji: '🎒',
     title: '출발 전날 짐싸기',
     intro: '아이와 함께 체크하면 그것도 스키 교육이에요.',
     items: [
@@ -56,7 +53,6 @@ export const CHECKLIST_GROUPS: ChecklistGroup[] = [
   },
   {
     id: 'morning',
-    emoji: '🌅',
     title: '당일 아침',
     items: [
       { id: 'morning-weather', text: '홈 탭에서 오늘 스키 지수·설질 확인', note: '슬러시 예보면 오전 위주 일정으로' },

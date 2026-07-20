@@ -735,6 +735,282 @@ body {
   border-radius: 999px;
 }
 
+/* ── 가족 탭 ──────────────────────────── */
+.account-card {
+  padding: 14px 16px;
+}
+
+.account-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.account-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--brand-soft);
+  color: var(--brand);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.account-meta {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.35;
+}
+
+.account-meta strong {
+  font-size: 1rem;
+}
+
+.account-meta span {
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+}
+
+.empty-card {
+  text-align: center;
+  padding: 28px 18px;
+  color: var(--ink-soft);
+}
+
+.empty-card svg {
+  color: var(--brand);
+  margin-bottom: 8px;
+}
+
+.empty-card p {
+  font-size: 0.9rem;
+}
+
+.member-card {
+  padding: 0;
+  overflow: hidden;
+}
+
+.member-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  border: none;
+  background: none;
+  padding: 14px 16px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.member-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--brand-soft);
+  color: var(--brand);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.member-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.35;
+}
+
+.member-info strong {
+  font-size: 0.98rem;
+}
+
+.member-sub {
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+}
+
+.member-chevron {
+  color: var(--ink-soft);
+}
+
+.member-actions {
+  display: flex;
+  gap: 8px;
+  padding: 0 16px 16px;
+}
+
+/* 추천 세팅 박스 */
+.rec-box {
+  margin: 0 16px 14px;
+  background: #f6f9ff;
+  border: 1px solid var(--brand-soft);
+  border-radius: 12px;
+  padding: 12px 14px;
+}
+
+.rec-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 0;
+}
+
+.rec-key {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.88rem;
+  color: var(--ink-soft);
+}
+
+.rec-key svg {
+  color: var(--brand);
+}
+
+.rec-val {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.rec-note {
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+  margin: -2px 0 6px;
+}
+
+.rec-disclaimer {
+  font-size: 0.74rem;
+  color: var(--ink-soft);
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed #dde6f4;
+}
+
+/* 폼 */
+.form-2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.member-form input,
+.member-form select {
+  width: 100%;
+  font-size: 1rem;
+  padding: 11px 12px;
+  border-radius: 12px;
+  border: 1.5px solid var(--brand-soft);
+  background: #fbfdff;
+  color: var(--ink);
+}
+
+.form-hint {
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+  margin: 2px 0 6px;
+}
+
+.form-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+/* 버튼 */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: none;
+  background: var(--brand);
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 700;
+  padding: 12px 18px;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+}
+
+.btn-primary.full {
+  width: 100%;
+}
+
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  border: 1.5px solid var(--brand-soft);
+  background: none;
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 10px 16px;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.btn-ghost.sm {
+  padding: 7px 12px;
+  font-size: 0.82rem;
+}
+
+.btn-ghost.danger {
+  color: #d9455f;
+  border-color: #f6d0d7;
+}
+
+.form-actions .btn-ghost,
+.form-actions .btn-primary {
+  flex: 1;
+}
+
+/* 아이콘 정렬 보정 */
+.card-title,
+.rec-key,
+.stage-goal,
+.family-link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.stage-ready .ready-ico {
+  color: #1fa564;
+  vertical-align: -2px;
+}
+
+.family-link {
+  justify-content: center;
+}
+
+.tab-emoji {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dial-grade {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 1rem;
+  font-weight: 700;
+  margin-top: -6px;
+}
+
 /* ── 하단 탭바 ─────────────────────────── */
 .tab-bar {
   position: fixed;

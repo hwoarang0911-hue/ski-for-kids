@@ -35,7 +35,7 @@ export function ChecklistPage() {
 
   return (
     <div className="page">
-      <h2 className="page-title">준비 체크리스트 ✅</h2>
+      <h2 className="page-title">준비 체크리스트</h2>
       <p className="page-intro">
         체크한 내용은 이 기기에 저장돼요. 새 시즌·새 여행을 시작할 땐 각 목록의
         초기화 버튼을 누르세요.
@@ -58,7 +58,7 @@ export function ChecklistPage() {
         return (
           <Accordion
             key={group.id}
-            emoji={group.emoji}
+            icon={group.id}
             title={`${group.title} (${done}/${group.items.length})`}
             defaultOpen={group.id === 'pack'}
           >

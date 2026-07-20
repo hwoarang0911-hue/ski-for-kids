@@ -1,15 +1,15 @@
 import { useState } from 'react';
+import { recommendPoleLength } from '../lib/recommend';
 
 /**
- * 폴 길이 추천: 키 × 0.68~0.70 (5cm 단위 반올림).
+ * 폴 길이 추천: 키 × 0.69 (5cm 단위 반올림).
  * 팔꿈치가 90도가 되는 길이와 거의 같다.
  */
 export function PoleCalc() {
   const [height, setHeight] = useState('');
   const h = parseFloat(height);
   const valid = !Number.isNaN(h) && h >= 80 && h <= 210;
-  const exact = valid ? h * 0.69 : 0;
-  const rounded = Math.round(exact / 5) * 5;
+  const rounded = valid ? recommendPoleLength(h) : 0;
 
   return (
     <div className="calc">

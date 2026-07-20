@@ -6,7 +6,7 @@
 export interface GearSection {
   id: string;
   title: string;
-  emoji: string;
+  icon: string;
   intro?: string;
   items: { heading: string; body: string }[];
   /** 참고한 해외 기관/프로그램 */
@@ -17,7 +17,7 @@ export const GEAR_SECTIONS: GearSection[] = [
   {
     id: 'flex',
     title: '플렉스(Flex)가 뭐예요?',
-    emoji: '🎿',
+    icon: 'flex',
     intro: '플렉스는 스키와 부츠가 얼마나 단단한지를 나타내요. 숫자가 클수록 단단합니다.',
     items: [
       {
@@ -37,7 +37,7 @@ export const GEAR_SECTIONS: GearSection[] = [
   {
     id: 'boots',
     title: '부츠 고르기 (사이즈가 제일 중요!)',
-    emoji: '🥾',
+    icon: 'boots',
     intro: '스키 실력의 절반은 부츠 핏에서 나와요. 스키보다 부츠에 먼저 투자하세요.',
     items: [
       {
@@ -57,7 +57,7 @@ export const GEAR_SECTIONS: GearSection[] = [
   {
     id: 'helmet',
     title: '헬멧·고글·장갑 고르기',
-    emoji: '⛑️',
+    icon: 'helmet',
     intro: '머리 보호는 타협하지 마세요. 국내외 스키장 어린이 헬멧 착용은 이제 기본입니다.',
     items: [
       {
@@ -90,7 +90,7 @@ export const GEAR_SECTIONS: GearSection[] = [
   {
     id: 'din',
     title: '딘(DIN)? 바인딩 이탈값 쉽게 알기',
-    emoji: '🔗',
+    icon: 'din',
     intro: '딘(DIN)은 넘어졌을 때 부츠가 스키에서 "톡" 하고 빠지는 강도예요. 다리 부상을 막아주는 가장 중요한 안전장치입니다.',
     items: [
       {
@@ -110,7 +110,7 @@ export const GEAR_SECTIONS: GearSection[] = [
   {
     id: 'maintenance',
     title: '자가 정비 입문 (왁싱·엣지·보관)',
-    emoji: '🛠️',
+    icon: 'maintenance',
     intro: '거창한 장비 없이도 집에서 할 수 있는 기본 정비만으로 스키가 오래, 잘 나가요.',
     items: [
       {
@@ -134,7 +134,7 @@ export const GEAR_SECTIONS: GearSection[] = [
   {
     id: 'used',
     title: '중고 스키 살 때 체크리스트',
-    emoji: '♻️',
+    icon: 'used',
     intro: '성장기 아이 장비는 중고가 합리적이에요. 아래만 확인하면 실패하지 않아요.',
     items: [
       {

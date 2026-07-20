@@ -5,6 +5,7 @@ import { TEACHING_INTRO, TEACHING_STAGES } from '../data/teachingGuide';
 import { TipCard } from '../components/TipCard';
 import { ResourceCard } from '../components/ResourceCard';
 import { Accordion } from '../components/Accordion';
+import { Icon } from '../lib/icons';
 
 const TIP_CATEGORIES: TipCategory[] = ['날씨·설질', '아이와 함께', '장비', '안전', '재미'];
 
@@ -16,7 +17,7 @@ export function LearnPage() {
 
   return (
     <div className="page">
-      <h2 className="page-title">배움터 📚</h2>
+      <h2 className="page-title">배움터</h2>
       <div className="segment">
         <button className={tab === 'teach' ? 'active' : ''} onClick={() => setTab('teach')}>가르치기</button>
         <button className={tab === 'tips' ? 'active' : ''} onClick={() => setTab('tips')}>팁 모음</button>
@@ -31,8 +32,8 @@ export function LearnPage() {
             <p className="source-note">참고: {TEACHING_INTRO.source}</p>
           </div>
           {TEACHING_STAGES.map((stage) => (
-            <Accordion key={stage.id} emoji={stage.emoji} title={stage.title}>
-              <p className="stage-goal">🎯 목표: {stage.goal}</p>
+            <Accordion key={stage.id} icon={stage.id} title={stage.title}>
+              <p className="stage-goal"><Icon name="goal" /> 목표: {stage.goal}</p>
               <div className="content-item">
                 <h4>이렇게 해요</h4>
                 <ul className="stage-list">
@@ -55,7 +56,7 @@ export function LearnPage() {
                 <h4>다음 단계로 가도 되는 신호</h4>
                 <ul className="stage-list stage-ready">
                   {stage.ready.map((r, i) => (
-                    <li key={i}>✅ {r}</li>
+                    <li key={i}><Icon name="ready" className="ready-ico" /> {r}</li>
                   ))}
                 </ul>
               </div>

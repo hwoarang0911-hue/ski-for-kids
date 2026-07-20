@@ -4,15 +4,18 @@ import { GearPage } from './pages/GearPage';
 import { SafetyPage } from './pages/SafetyPage';
 import { LearnPage } from './pages/LearnPage';
 import { ChecklistPage } from './pages/ChecklistPage';
+import { FamilyPage } from './pages/FamilyPage';
+import { Icon } from './lib/icons';
 
-type TabId = 'home' | 'gear' | 'safety' | 'check' | 'learn';
+type TabId = 'home' | 'gear' | 'safety' | 'check' | 'family' | 'learn';
 
-const TABS: { id: TabId; label: string; emoji: string }[] = [
-  { id: 'home', label: '홈', emoji: '⛷️' },
-  { id: 'gear', label: '장비', emoji: '🎿' },
-  { id: 'safety', label: '안전', emoji: '🛟' },
-  { id: 'check', label: '준비', emoji: '✅' },
-  { id: 'learn', label: '배움터', emoji: '📚' },
+const TABS: { id: TabId; label: string }[] = [
+  { id: 'home', label: '홈' },
+  { id: 'gear', label: '장비' },
+  { id: 'safety', label: '안전' },
+  { id: 'check', label: '준비' },
+  { id: 'family', label: '가족' },
+  { id: 'learn', label: '배움터' },
 ];
 
 export default function App() {
@@ -29,6 +32,7 @@ export default function App() {
         {tab === 'gear' && <GearPage />}
         {tab === 'safety' && <SafetyPage />}
         {tab === 'check' && <ChecklistPage />}
+        {tab === 'family' && <FamilyPage />}
         {tab === 'learn' && <LearnPage />}
       </main>
 
@@ -40,7 +44,7 @@ export default function App() {
             onClick={() => setTab(t.id)}
             aria-current={tab === t.id ? 'page' : undefined}
           >
-            <span className="tab-emoji" aria-hidden>{t.emoji}</span>
+            <span className="tab-emoji"><Icon name={t.id} size={22} /></span>
             <span className="tab-label">{t.label}</span>
           </button>
         ))}

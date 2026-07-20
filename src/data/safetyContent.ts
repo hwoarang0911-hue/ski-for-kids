@@ -7,7 +7,6 @@
 export interface SafetySection {
   id: string;
   title: string;
-  emoji: string;
   intro?: string;
   items: { heading: string; body: string }[];
   /** 참고한 해외 기관/프로그램 */
@@ -18,7 +17,6 @@ export const SAFETY_SECTIONS: SafetySection[] = [
   {
     id: 'lift',
     title: '리프트 안전하게 타기',
-    emoji: '🚡',
     intro: '리프트는 무섭지 않아요. 순서만 알면 아이도 씩씩하게 탈 수 있어요.',
     items: [
       {
@@ -47,7 +45,6 @@ export const SAFETY_SECTIONS: SafetySection[] = [
   {
     id: 'fis',
     title: '슬로프 예절 10가지 (FIS 규칙 쉬운 버전)',
-    emoji: '🤝',
     intro: '전 세계 스키장이 함께 쓰는 국제 규칙이에요. 아이와 함께 하나씩 읽어보세요.',
     items: [
       { heading: '① 다른 사람을 다치게 하지 않기', body: '스키장의 제1규칙. 내 재미보다 모두의 안전이 먼저예요.' },
@@ -70,7 +67,6 @@ export const SAFETY_SECTIONS: SafetySection[] = [
   {
     id: 'warmup',
     title: '준비운동·휴식·체력 관리',
-    emoji: '🤸',
     intro: '스키 부상의 상당수는 "지친 마지막 한 번"과 "준비 안 된 첫 번"에 일어나요.',
     items: [
       {
@@ -94,7 +90,6 @@ export const SAFETY_SECTIONS: SafetySection[] = [
   {
     id: 'weather',
     title: '추위·햇빛·시야 대처법',
-    emoji: '🌡️',
     intro: '산 위 날씨는 시내와 달라요. 조금 과하다 싶게 준비하는 게 맞아요.',
     items: [
       {
@@ -118,7 +113,6 @@ export const SAFETY_SECTIONS: SafetySection[] = [
   {
     id: 'injury',
     title: '부상 예방 — 소아과 의사들의 권고',
-    emoji: '🩹',
     intro: '미국소아과학회(AAP)가 어린이 스키·스노보드에 대해 권고하는 내용이에요.',
     items: [
       {
@@ -147,7 +141,6 @@ export const SAFETY_SECTIONS: SafetySection[] = [
   {
     id: 'park',
     title: '터레인파크는 이렇게 (Park SMART)',
-    emoji: '🛹',
     intro:
       '점프대·레일이 있는 터레인파크에 아이가 관심을 보인다면, 미국 스키장들이 쓰는 Park SMART 5원칙부터 가르쳐주세요.',
     items: [
@@ -162,7 +155,6 @@ export const SAFETY_SECTIONS: SafetySection[] = [
   {
     id: 'emergency',
     title: '미아·부상 시 행동 요령',
-    emoji: '🆘',
     intro: '미리 약속해두면 진짜 상황에서 아이가 당황하지 않아요.',
     items: [
       {

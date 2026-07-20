@@ -14,18 +14,17 @@ export interface SkiIndexResult {
   score: number; // 0~100
   grade: Grade;
   label: string;
-  emoji: string;
   /** 아이에게 읽어줄 한 줄 요약 */
   kidsSummary: string;
   factors: IndexFactor[];
 }
 
-const GRADE_META: Record<Grade, { label: string; emoji: string }> = {
-  best: { label: '최고', emoji: '🤩' },
-  good: { label: '좋음', emoji: '😄' },
-  fair: { label: '보통', emoji: '🙂' },
-  caution: { label: '주의', emoji: '😐' },
-  bad: { label: '나쁨', emoji: '😵' },
+const GRADE_LABEL: Record<Grade, string> = {
+  best: '최고',
+  good: '좋음',
+  fair: '보통',
+  caution: '주의',
+  bad: '나쁨',
 };
 
 function gradeOf(score: number): Grade {
@@ -41,8 +40,8 @@ function kidsSummaryOf(grade: Grade, snow: SnowInfo, factors: IndexFactor[]): st
   switch (grade) {
     case 'best':
       return snow.kind === 'powder'
-        ? '와! 새 눈이 소복소복, 오늘 눈이 최고예요! ⛷️'
-        : '오늘은 스키 타기 딱 좋은 날이에요! ⛷️';
+        ? '와! 새 눈이 소복소복, 오늘 눈이 최고예요!'
+        : '오늘은 스키 타기 딱 좋은 날이에요!';
     case 'good':
       return '오늘 스키 타러 가요! 기분 좋은 하루가 될 거예요.';
     case 'fair':
@@ -112,13 +111,11 @@ export function computeSkiIndex(now: HourPoint, snow: SnowInfo): SkiIndexResult 
 
   const score = Math.max(0, Math.min(100, 100 + factors.reduce((s, f) => s + f.impact, 0)));
   const grade = gradeOf(score);
-  const meta = GRADE_META[grade];
 
   return {
     score,
     grade,
-    label: meta.label,
-    emoji: meta.emoji,
+    label: GRADE_LABEL[grade],
     kidsSummary: kidsSummaryOf(grade, snow, factors),
     factors: factors.sort((a, b) => a.impact - b.impact),
   };

@@ -5,34 +5,28 @@ export type SnowConditionKind = 'powder' | 'groomed' | 'wet' | 'slush' | 'icy';
 export interface SnowInfo {
   kind: SnowConditionKind;
   label: string;
-  emoji: string;
   description: string;
 }
 
 const INFO: Record<SnowConditionKind, Omit<SnowInfo, 'kind'>> = {
   powder: {
     label: '파우더·신설',
-    emoji: '❄️',
     description: '새 눈이 쌓여 푹신해요. 넘어져도 아프지 않아 아이가 도전하기 좋은 날!',
   },
   groomed: {
     label: '정설(그루밍)',
-    emoji: '🎿',
     description: '잘 다져진 기본 설질이에요. 개장 직후가 가장 매끈해요.',
   },
   wet: {
     label: '습설',
-    emoji: '💧',
     description: '눈에 물기가 있어 약간 무거워요. 스키가 평소보다 느리게 나가요.',
   },
   slush: {
     label: '슬러시',
-    emoji: '🍧',
     description: '눈이 녹아 질척해요. 다리에 힘이 많이 들어가니 오전 위주로 타고 일찍 쉬세요.',
   },
   icy: {
     label: '아이스·강설면',
-    emoji: '🧊',
     description: '녹았다 얼어 단단하고 미끄러워요. 아이는 초급 슬로프와 정설 직후 시간대가 안전해요.',
   },
 };

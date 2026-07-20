@@ -9,6 +9,7 @@ import { ScoreDial } from '../components/ScoreDial';
 import { WeatherCard } from '../components/WeatherCard';
 import { HourlyStrip } from '../components/HourlyStrip';
 import { TipCard } from '../components/TipCard';
+import { SNOW_ICONS, LuLightbulb, LuUsers, LuExternalLink } from '../lib/icons';
 
 const STORAGE_KEY = 'ski-for-kids.resort';
 
@@ -98,7 +99,11 @@ export function HomePage() {
             <p className="kids-summary">{derived.index.kidsSummary}</p>
             <div className="snow-badge-row">
               <span className={`snow-badge snow-${derived.snow.kind}`}>
-                {derived.snow.emoji} 설질: {derived.snow.label}
+                {(() => {
+                  const SnowIco = SNOW_ICONS[derived.snow.kind];
+                  return <SnowIco size={15} aria-hidden />;
+                })()}{' '}
+                설질: {derived.snow.label}
               </span>
             </div>
             <p className="snow-desc">{derived.snow.description}</p>
@@ -123,7 +128,7 @@ export function HomePage() {
           <HourlyStrip weather={weather!} />
 
           <div className="card">
-            <h3 className="card-title">오늘의 팁 💡</h3>
+            <h3 className="card-title"><LuLightbulb size={17} /> 오늘의 팁</h3>
             {derived.tips.map((tip) => (
               <TipCard key={tip.id} tip={tip} />
             ))}
@@ -131,25 +136,25 @@ export function HomePage() {
 
           {RESORT_FAMILY[resort.id] && (
             <div className="card family-card">
-              <h3 className="card-title">👨‍👩‍👧 {resort.name} 가족 정보</h3>
+              <h3 className="card-title"><LuUsers size={17} /> {resort.name} 가족 정보</h3>
               <div className="content-item">
-                <h4>🎿 초보·어린이 슬로프</h4>
+                <h4>초보·어린이 슬로프</h4>
                 <p>{RESORT_FAMILY[resort.id].beginner}</p>
               </div>
               {RESORT_FAMILY[resort.id].kids && (
                 <div className="content-item">
-                  <h4>🛷 키즈·눈놀이</h4>
+                  <h4>키즈·눈놀이</h4>
                   <p>{RESORT_FAMILY[resort.id].kids}</p>
                 </div>
               )}
               {RESORT_FAMILY[resort.id].lesson && (
                 <div className="content-item">
-                  <h4>🧑‍🏫 어린이 강습</h4>
+                  <h4>어린이 강습</h4>
                   <p>{RESORT_FAMILY[resort.id].lesson}</p>
                 </div>
               )}
               <div className="content-item">
-                <h4>💬 가족 팁</h4>
+                <h4>가족 팁</h4>
                 <p>{RESORT_FAMILY[resort.id].tip}</p>
               </div>
               <a
@@ -158,7 +163,7 @@ export function HomePage() {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                공식 홈페이지에서 운영·요금 확인하기 →
+                공식 홈페이지에서 운영·요금 확인하기 <LuExternalLink size={14} />
               </a>
             </div>
           )}

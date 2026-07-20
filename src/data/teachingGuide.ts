@@ -6,7 +6,6 @@
  */
 export interface TeachingStage {
   id: string;
-  emoji: string;
   title: string;
   /** 이 단계의 목표 한 줄 */
   goal: string;
@@ -33,7 +32,6 @@ export const TEACHING_INTRO = {
 export const TEACHING_STAGES: TeachingStage[] = [
   {
     id: 'stage0',
-    emoji: '🏠',
     title: '0단계 — 눈밭에 나가기 전에',
     goal: '스키가 "무섭고 낯선 것"이 아니게 만들기',
     how: [
@@ -48,7 +46,6 @@ export const TEACHING_STAGES: TeachingStage[] = [
   },
   {
     id: 'stage1',
-    emoji: '👣',
     title: '1단계 — 장비와 친해지기 & 평지 걷기',
     goal: '스키를 신고 평지에서 자유롭게 움직이기',
     how: [
@@ -67,7 +64,6 @@ export const TEACHING_STAGES: TeachingStage[] = [
   },
   {
     id: 'stage2',
-    emoji: '⛰️',
     title: '2단계 — 무빙워크와 아주 완만한 경사',
     goal: '살짝 미끄러지는 감각에 익숙해지기',
     how: [
@@ -87,7 +83,6 @@ export const TEACHING_STAGES: TeachingStage[] = [
   },
   {
     id: 'stage3',
-    emoji: '🍕',
     title: '3단계 — 피자로 멈추기 (제동 웨지)',
     goal: '스스로 속도를 줄이고 멈출 수 있기',
     how: [
@@ -107,7 +102,6 @@ export const TEACHING_STAGES: TeachingStage[] = [
   },
   {
     id: 'stage4',
-    emoji: '🔄',
     title: '4단계 — 피자로 방향 바꾸기 (웨지 턴)',
     goal: '가고 싶은 방향으로 턴하기',
     how: [
@@ -127,7 +121,6 @@ export const TEACHING_STAGES: TeachingStage[] = [
   },
   {
     id: 'stage5',
-    emoji: '🚡',
     title: '5단계 — 리프트 데뷔와 초급 슬로프',
     goal: '리프트를 타고 초급 슬로프를 완주하기',
     how: [
@@ -146,7 +139,6 @@ export const TEACHING_STAGES: TeachingStage[] = [
   },
   {
     id: 'stage6',
-    emoji: '🎿',
     title: '6단계 — 피자 졸업, 평행 스키로',
     goal: 'A자를 점점 좁혀 11자 턴으로 발전하기',
     how: [
