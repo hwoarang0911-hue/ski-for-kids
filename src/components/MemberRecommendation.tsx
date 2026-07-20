@@ -23,29 +23,34 @@ export function MemberRecommendation({ member }: { member: FamilyMember }) {
     return { ski, pole, din, style };
   }, [member]);
 
+  const poleText = member.level === 'first' ? '없이 시작 권장' : `약 ${rec.pole}cm`;
+
   return (
     <div className="rec-box">
-      <div className="rec-row">
-        <span className="rec-key"><Icon name="ruler" /> 스키 길이</span>
-        <span className="rec-val">{Math.round(rec.ski.min)}~{Math.round(rec.ski.max)}cm</span>
+      {/* 값만 모아서 위에 */}
+      <div className="rec-rows">
+        <div className="rec-row">
+          <span className="rec-key"><Icon name="ruler" /> 스키 길이</span>
+          <span className="rec-val">{Math.round(rec.ski.min)}~{Math.round(rec.ski.max)}cm</span>
+        </div>
+        <div className="rec-row">
+          <span className="rec-key"><Icon name="pole" /> 폴 길이</span>
+          <span className="rec-val">{poleText}</span>
+        </div>
+        <div className="rec-row">
+          <span className="rec-key"><Icon name="din" /> DIN 참고값</span>
+          <span className="rec-val">{rec.din !== null ? rec.din.toFixed(2) : '샵 상담'}</span>
+        </div>
       </div>
-      <p className="rec-note">{rec.ski.note}</p>
 
-      <div className="rec-row">
-        <span className="rec-key"><Icon name="pole" /> 폴 길이</span>
-        <span className="rec-val">
-          {member.level === 'first' ? '없이 시작 권장' : `약 ${rec.pole}cm`}
-        </span>
+      {/* 부가 설명은 아래에 한번에 모아서 */}
+      <div className="rec-notes">
+        <p><strong>스키 길이</strong> — {rec.ski.note}</p>
+        {member.level === 'first' && (
+          <p><strong>폴</strong> — 처음 배울 땐 폴 없이 시작하는 게 A자 연습에 좋아요.</p>
+        )}
+        <p><strong>DIN</strong> — 스타일 「{STYLE_LABELS[rec.style]}」 기준, 부츠 밑창 길이는 키로 자동 추정한 참고값이에요. 실제 조정은 반드시 장비샵에서 받으세요.</p>
       </div>
-
-      <div className="rec-row">
-        <span className="rec-key"><Icon name="din" /> DIN 참고값</span>
-        <span className="rec-val">{rec.din !== null ? rec.din.toFixed(2) : '샵 상담'}</span>
-      </div>
-      <p className="rec-note">스타일: {STYLE_LABELS[rec.style]} · 밑창 길이는 키로 자동 추정</p>
-      <p className="rec-disclaimer">
-        DIN은 참고용이에요. 실제 조정은 반드시 장비샵에서 받으세요.
-      </p>
     </div>
   );
 }

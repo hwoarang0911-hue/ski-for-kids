@@ -26,17 +26,20 @@ export interface SkiLengthResult {
   note: string;
 }
 
-/** 어린이·초보 기준: 처음/초보는 턱 높이 근처, 익숙해질수록 코~머리 높이 */
+/**
+ * 스키 길이 추천. 스키를 세웠을 때 팁이 닿는 키 높이 기준.
+ * 처음/초보는 턱 높이, 익숙해질수록 코~머리 높이로 길어진다.
+ */
 export function recommendSkiLength(heightCm: number, level: SkillLevel): SkiLengthResult {
   switch (level) {
     case 'first':
-      return { min: heightCm - 25, max: heightCm - 18, note: '가슴~턱 높이. 짧을수록 돌리기 쉬워 처음 배우기 좋아요.' };
+      return { min: heightCm - 20, max: heightCm - 13, note: '가슴~턱 높이. 짧을수록 돌리기 쉬워 처음 배우기 좋아요.' };
     case 'beginner':
-      return { min: heightCm - 20, max: heightCm - 13, note: '턱 높이 전후. A자(피자) 연습이 잘 되는 길이예요.' };
+      return { min: heightCm - 15, max: heightCm - 8, note: '턱 높이 전후. A자(피자) 연습이 잘 되는 길이예요.' };
     case 'intermediate':
-      return { min: heightCm - 13, max: heightCm - 7, note: '턱~코 높이. 턴이 안정된 사람에게 맞아요.' };
+      return { min: heightCm - 10, max: heightCm - 3, note: '턱~코 높이. 턴이 안정된 사람에게 맞아요.' };
     case 'advanced':
-      return { min: heightCm - 10, max: heightCm - 2, note: '코~눈 높이. 평행 턴과 속도를 즐기는 사람에게 맞아요.' };
+      return { min: heightCm - 5, max: heightCm + 3, note: '코~머리 높이. 평행 턴과 속도를 즐기는 사람에게 맞아요.' };
   }
 }
 

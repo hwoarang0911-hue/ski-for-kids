@@ -909,18 +909,24 @@ body {
   color: var(--ink);
 }
 
-.rec-note {
-  font-size: 0.78rem;
-  color: var(--ink-soft);
-  margin: -2px 0 6px;
+.rec-notes {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed #dde6f4;
 }
 
-.rec-disclaimer {
-  font-size: 0.74rem;
+.rec-notes p {
+  font-size: 0.8rem;
   color: var(--ink-soft);
-  margin-top: 8px;
-  padding-top: 8px;
-  border-top: 1px dashed #dde6f4;
+  margin-bottom: 5px;
+}
+
+.rec-notes p:last-child {
+  margin-bottom: 0;
+}
+
+.rec-notes strong {
+  color: var(--ink);
 }
 
 /* 폼 */
