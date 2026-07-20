@@ -61,9 +61,14 @@ import {
   LuCableCar,
   LuRoute,
   LuOctagon,
+  LuPersonStanding,
+  LuArrowDownUp,
+  LuChevronsDown,
+  LuMoveUpRight,
   LuSkull,
 } from 'react-icons/lu';
-import { TbSnowboarding as TbSki } from 'react-icons/tb';
+import { GiSkis } from 'react-icons/gi';
+import { FaPersonSkiing } from 'react-icons/fa6';
 
 /**
  * 앱 전역 아이콘 레지스트리.
@@ -73,21 +78,21 @@ import { TbSnowboarding as TbSki } from 'react-icons/tb';
 export const iconMap: Record<string, IconType> = {
   // 탭
   home: LuHouse,
-  gear: TbSki,
+  gear: GiSkis,
   safety: LuShield,
   check: LuClipboardCheck,
   learn: LuGraduationCap,
   family: LuUsers,
 
   // 장비 가이드 섹션
-  flex: TbSki,
+  flex: FaPersonSkiing,
   boots: LuFootprints,
   helmet: LuHardHat,
   din: LuLink,
   maintenance: LuWrench,
   used: LuRecycle,
   ruler: LuRuler,
-  pole: TbSki,
+  pole: GiSkis,
 
   // 안전 섹션
   lift: LuCableCar,
@@ -100,9 +105,13 @@ export const iconMap: Record<string, IconType> = {
   emergency: LuLifeBuoy,
 
   // 배움터 기술 개념
+  stance: LuPersonStanding,
+  fall: LuArrowDownUp,
   turnPurpose: LuRotateCw,
+  sideslip: LuChevronsDown,
+  traverse: LuMoveUpRight,
   hockeystop: LuOctagon,
-  carving: TbSki,
+  carving: FaPersonSkiing,
 
   // 체크리스트 그룹
   season: LuCalendarDays,
@@ -116,7 +125,7 @@ export const iconMap: Record<string, IconType> = {
   stage3: LuPizza,
   stage4: LuRotateCw,
   stage5: LuCableCar,
-  stage6: TbSki,
+  stage6: FaPersonSkiing,
 
   // 범용
   tip: LuLightbulb,
@@ -168,7 +177,7 @@ export {
   LuCloud,
   LuSnowflake,
   LuTriangleAlert,
-  TbSki,
+  GiSkis,
 };
 
 // 등급 얼굴 아이콘 (스키 지수)
@@ -183,7 +192,7 @@ export const GRADE_ICONS: Record<string, IconType> = {
 // 설질 아이콘
 export const SNOW_ICONS: Record<string, IconType> = {
   powder: LuSnowflake,
-  groomed: TbSki,
+  groomed: FaPersonSkiing,
   wet: LuDroplet,
   slush: LuDroplets,
   icy: LuThermometerSnowflake,
