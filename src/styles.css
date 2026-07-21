@@ -123,8 +123,78 @@ body {
   padding: 34px 16px;
 }
 
-.loading-emoji {
-  font-size: 2.2rem;
+.loading-skier {
+  position: relative;
+  width: 100%;
+  height: 90px;
+  margin-bottom: 10px;
+  overflow: hidden;
+  border-radius: 14px;
+  background: linear-gradient(180deg, #cfe0fb 0%, #e8f0fd 100%);
+}
+
+.loading-snowfall {
+  position: absolute;
+  inset: 0;
+}
+
+.loading-flake {
+  position: absolute;
+  top: -12%;
+  left: calc(8% + (var(--i) * 11%));
+  color: #ffffff;
+  opacity: 0.85;
+  font-size: 12px;
+  animation: flake-fall 2.6s linear infinite;
+  animation-delay: calc(var(--i) * -0.32s);
+}
+
+.loading-flake:nth-child(odd) {
+  font-size: 9px;
+  animation-duration: 2.1s;
+}
+
+@keyframes flake-fall {
+  0% {
+    transform: translateY(-10px) translateX(0);
+  }
+  50% {
+    transform: translateY(45px) translateX(4px);
+  }
+  100% {
+    transform: translateY(100px) translateX(-2px);
+  }
+}
+
+.loading-skier-icon {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  width: 34px;
+  height: 34px;
+  color: var(--brand);
+  filter: drop-shadow(0 3px 3px rgba(43, 108, 234, 0.25));
+  animation: skier-slide 1.8s ease-in-out infinite;
+}
+
+@keyframes skier-slide {
+  0%, 100% {
+    transform: translate(-42px, 2px) rotate(-8deg);
+  }
+  50% {
+    transform: translate(26px, -5px) rotate(8deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loading-flake,
+  .loading-skier-icon {
+    animation: none;
+  }
+}
+
+.error-icon {
+  color: var(--ink-soft);
   margin-bottom: 8px;
 }
 

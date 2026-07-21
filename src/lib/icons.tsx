@@ -13,6 +13,7 @@ import {
   LuCloudFog,
   LuCloudLightning,
   LuCloudSun,
+  LuCloudOff,
   LuSun,
   LuSnowflake,
   LuDroplet,
@@ -176,6 +177,7 @@ export {
   LuCloud,
   LuSnowflake,
   LuTriangleAlert,
+  LuCloudOff,
   FaPersonSkiing,
 };
 

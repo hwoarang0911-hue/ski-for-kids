@@ -9,7 +9,8 @@ import { ScoreDial } from '../components/ScoreDial';
 import { WeatherCard } from '../components/WeatherCard';
 import { HourlyStrip } from '../components/HourlyStrip';
 import { TipCard } from '../components/TipCard';
-import { SNOW_ICONS, LuLightbulb, LuUsers, LuExternalLink } from '../lib/icons';
+import { LoadingSkier } from '../components/LoadingSkier';
+import { SNOW_ICONS, LuLightbulb, LuUsers, LuExternalLink, LuCloudOff } from '../lib/icons';
 
 const STORAGE_KEY = 'ski-for-kids.resort';
 
@@ -78,14 +79,14 @@ export function HomePage() {
 
       {loading && (
         <div className="card center-card">
-          <p className="loading-emoji">⛷️</p>
+          <LoadingSkier />
           <p>{resort.name} 날씨를 확인하고 있어요…</p>
         </div>
       )}
 
       {error && !loading && (
         <div className="card center-card">
-          <p className="loading-emoji">😢</p>
+          <LuCloudOff className="error-icon" size={40} />
           <p>{error}</p>
           <button className="retry-btn" onClick={() => selectResort(resort.id)}>다시 시도</button>
         </div>
