@@ -9,8 +9,8 @@ import { ScoreDial } from '../components/ScoreDial';
 import { WeatherCard } from '../components/WeatherCard';
 import { HourlyStrip } from '../components/HourlyStrip';
 import { TipCard } from '../components/TipCard';
-import { LoadingSkier } from '../components/LoadingSkier';
 import { SNOW_ICONS, LuLightbulb, LuUsers, LuExternalLink, LuCloudOff } from '../lib/icons';
+import { FaPersonSkiing } from 'react-icons/fa6';
 
 const STORAGE_KEY = 'ski-for-kids.resort';
 
@@ -79,7 +79,7 @@ export function HomePage() {
 
       {loading && (
         <div className="card center-card">
-          <LoadingSkier />
+          <FaPersonSkiing className="loading-icon" size={36} />
           <p>{resort.name} 날씨를 확인하고 있어요…</p>
         </div>
       )}
