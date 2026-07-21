@@ -67,7 +67,6 @@ import {
   LuMoveUpRight,
   LuSkull,
 } from 'react-icons/lu';
-import { GiSkis } from 'react-icons/gi';
 import { FaPersonSkiing } from 'react-icons/fa6';
 
 /**
@@ -78,7 +77,7 @@ import { FaPersonSkiing } from 'react-icons/fa6';
 export const iconMap: Record<string, IconType> = {
   // 탭
   home: LuHouse,
-  gear: GiSkis,
+  gear: FaPersonSkiing,
   safety: LuShield,
   check: LuClipboardCheck,
   learn: LuGraduationCap,
@@ -92,7 +91,7 @@ export const iconMap: Record<string, IconType> = {
   maintenance: LuWrench,
   used: LuRecycle,
   ruler: LuRuler,
-  pole: GiSkis,
+  pole: FaPersonSkiing,
 
   // 안전 섹션
   lift: LuCableCar,
@@ -177,7 +176,7 @@ export {
   LuCloud,
   LuSnowflake,
   LuTriangleAlert,
-  GiSkis,
+  FaPersonSkiing,
 };
 
 // 등급 얼굴 아이콘 (스키 지수)

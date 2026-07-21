@@ -65,16 +65,6 @@ export function LearnPage() {
                   ))}
                 </ul>
               </div>
-              {stage.games && (
-                <div className="content-item">
-                  <h4>게임처럼 익히기</h4>
-                  <ul className="stage-list">
-                    {stage.games.map((g, i) => (
-                      <li key={i}>{g}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
               <div className="content-item">
                 <h4>다음 단계로 가도 되는 신호</h4>
                 <ul className="stage-list stage-ready">
