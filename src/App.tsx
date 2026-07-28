@@ -5,16 +5,18 @@ import { SafetyPage } from './pages/SafetyPage';
 import { LearnPage } from './pages/LearnPage';
 import { ChecklistPage } from './pages/ChecklistPage';
 import { FamilyPage } from './pages/FamilyPage';
+import { InstructorsPage } from './pages/InstructorsPage';
 import { Icon, LuUser } from './lib/icons';
 import { useAccount } from './lib/account';
 
-type TabId = 'home' | 'gear' | 'safety' | 'check' | 'learn';
+type TabId = 'home' | 'gear' | 'safety' | 'check' | 'coach' | 'learn';
 
 const TABS: { id: TabId; label: string }[] = [
   { id: 'home', label: '홈' },
   { id: 'gear', label: '장비' },
   { id: 'safety', label: '안전' },
   { id: 'check', label: '준비' },
+  { id: 'coach', label: '강사' },
   { id: 'learn', label: '배움터' },
 ];
 
@@ -51,6 +53,7 @@ export default function App() {
             {tab === 'gear' && <GearPage />}
             {tab === 'safety' && <SafetyPage />}
             {tab === 'check' && <ChecklistPage />}
+            {tab === 'coach' && <InstructorsPage />}
             {tab === 'learn' && <LearnPage />}
           </>
         )}

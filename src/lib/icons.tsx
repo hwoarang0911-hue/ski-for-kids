@@ -62,6 +62,7 @@ import {
   LuCableCar,
   LuRoute,
   LuOctagon,
+  LuUserCheck,
   LuPersonStanding,
   LuArrowDownUp,
   LuChevronsDown,
@@ -81,6 +82,7 @@ export const iconMap: Record<string, IconType> = {
   gear: FaPersonSkiing,
   safety: LuShield,
   check: LuClipboardCheck,
+  coach: LuUserCheck,
   learn: LuGraduationCap,
   family: LuUsers,
 
