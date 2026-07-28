@@ -49,6 +49,8 @@ export interface Instructor {
   intro: string;
   awards: string[];
   products: LessonProduct[];
+  /** 기본 노출 후기(시드). 사용자 후기는 lessonStore에서 추가된다. */
+  seedReviews: { author: string; rating: number; text: string }[];
 }
 
 function resortName(id: string): string {
@@ -80,6 +82,10 @@ export const INSTRUCTORS: Instructor[] = [
       { id: 'p2', title: '어린이 소그룹 (2~3)', format: '소그룹', discipline: '입문·기초', groupMax: 3, durationMin: 120, priceKRW: 70000, perPerson: true },
       { id: 'p3', title: '가족 그룹 · 반나절', format: '가족', discipline: '입문·기초', groupMax: 4, durationMin: 240, priceKRW: 350000, includesGear: true },
     ],
+    seedReviews: [
+      { author: '민준맘', rating: 5, text: '겁 많던 아이가 첫날 리프트까지 탔어요. 아이 다루는 게 남다르세요.' },
+      { author: '아빠곰', rating: 5, text: '피자·프렌치프라이로 쉽게 알려주셔서 저도 배웠네요. 강추합니다.' },
+    ],
   },
   {
     id: 'lee-seoyeon',
@@ -103,6 +109,9 @@ export const INSTRUCTORS: Instructor[] = [
     products: [
       { id: 'p1', title: '어린이 1:1 프리미엄', format: '1:1', discipline: '인터스키', durationMin: 120, priceKRW: 180000, includesLift: false },
       { id: 'p2', title: '가족 1:2', format: '가족', discipline: '입문·기초', groupMax: 2, durationMin: 120, priceKRW: 220000 },
+    ],
+    seedReviews: [
+      { author: '스키맘', rating: 5, text: '데몬답게 자세 교정이 정확해요. 아이 기본기가 확 잡혔습니다.' },
     ],
   },
   {
@@ -129,6 +138,9 @@ export const INSTRUCTORS: Instructor[] = [
       { id: 'p2', title: '형제·친구 소그룹', format: '소그룹', discipline: '입문·기초', groupMax: 3, durationMin: 120, priceKRW: 60000, perPerson: true },
       { id: 'p3', title: '스노보드 1:1', format: '1:1', discipline: '스노보드', durationMin: 120, priceKRW: 110000 },
     ],
+    seedReviews: [
+      { author: '7살엄마', rating: 5, text: '유아 눈높이가 최고예요. 놀이처럼 해주셔서 아이가 또 가자고 해요.' },
+    ],
   },
   {
     id: 'choi-eunji',
@@ -152,6 +164,9 @@ export const INSTRUCTORS: Instructor[] = [
     products: [
       { id: 'p1', title: '스킬업 1:1', format: '1:1', discipline: '인터스키', durationMin: 120, priceKRW: 130000 },
       { id: 'p2', title: '모글 입문 그룹', format: '그룹', discipline: '모글·프리', groupMax: 5, durationMin: 120, priceKRW: 50000, perPerson: true },
+    ],
+    seedReviews: [
+      { author: '중급도전', rating: 5, text: '정체돼 있던 실력이 한 단계 올라갔어요. 설명이 명확합니다.' },
     ],
   },
   {
@@ -177,6 +192,10 @@ export const INSTRUCTORS: Instructor[] = [
       { id: 'p1', title: '어린이 1:1', format: '1:1', discipline: '입문·기초', durationMin: 120, priceKRW: 140000 },
       { id: 'p2', title: '주니어 레이싱 입문', format: '소그룹', discipline: '레이싱', groupMax: 4, durationMin: 120, priceKRW: 90000, perPerson: true },
       { id: 'p3', title: '가족 반나절', format: '가족', discipline: '입문·기초', groupMax: 4, durationMin: 240, priceKRW: 360000, includesGear: true },
+    ],
+    seedReviews: [
+      { author: '두아이맘', rating: 5, text: '형·동생 성향이 다른데 각각 맞춰주셨어요. 베테랑의 여유가 느껴져요.' },
+      { author: '레이싱꿈나무', rating: 4, text: '아이가 레이싱에 흥미를 붙였어요. 다음 시즌도 예약하려고요.' },
     ],
   },
 ];
