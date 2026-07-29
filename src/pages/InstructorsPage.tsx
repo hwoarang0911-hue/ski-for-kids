@@ -78,6 +78,26 @@ function shortestDur(i: Instructor) {
   return m >= 60 ? `${m / 60}시간` : `${m}분`;
 }
 
+/**
+ * 실제 사용자 후기를 기존 평점(과거 누적)에 가중 평균으로 반영한다.
+ * 새 후기가 쌓일수록 표시 평점·후기수가 움직인다.
+ */
+function effStats(i: Instructor, userReviews: { rating: number }[]): { rating: number; count: number } {
+  const base = i.rating * i.reviewCount;
+  const add = userReviews.reduce((s, r) => s + r.rating, 0);
+  const count = i.reviewCount + userReviews.length;
+  return { rating: count ? (base + add) / count : i.rating, count };
+}
+
+type SortKey = 'recommend' | 'rating' | 'price' | 'career';
+const SORTS: { key: SortKey; label: string }[] = [
+  { key: 'recommend', label: '추천순' },
+  { key: 'rating', label: '평점순' },
+  { key: 'price', label: '가격순' },
+  { key: 'career', label: '경력순' },
+];
+const DISCIPLINES_F: Discipline[] = ['입문·기초', '인터스키', '레이싱', '모글·프리', '스노보드'];
+
 function Stars({ rating, count }: { rating: number; count?: number }) {
   return (
     <span className="inst-stars">
@@ -102,19 +122,46 @@ export function InstructorsPage() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [resortId, setResortId] = useState<string>('all');
   const [format, setFormat] = useState<LessonFormat | 'all'>('all');
+  const [discipline, setDiscipline] = useState<Discipline | 'all'>('all');
   const [verifiedOnly, setVerifiedOnly] = useState(true);
+  const [kidsOnly, setKidsOnly] = useState(false);
+  const [sort, setSort] = useState<SortKey>('recommend');
   const [showApply, setShowApply] = useState(false);
 
-  const list = useMemo(
-    () =>
-      INSTRUCTORS.filter(
-        (i) =>
-          (resortId === 'all' || i.resortId === resortId) &&
-          (format === 'all' || i.formats.includes(format)) &&
-          (!verifiedOnly || i.verified),
-      ),
-    [resortId, format, verifiedOnly],
-  );
+  const allReviews = useReviews();
+  const reviewsByInstructor = useMemo(() => {
+    const m = new Map<string, { rating: number }[]>();
+    for (const r of allReviews) {
+      const arr = m.get(r.instructorId) ?? [];
+      arr.push({ rating: r.rating });
+      m.set(r.instructorId, arr);
+    }
+    return m;
+  }, [allReviews]);
+
+  const list = useMemo(() => {
+    const filtered = INSTRUCTORS.filter(
+      (i) =>
+        (resortId === 'all' || i.resortId === resortId) &&
+        (format === 'all' || i.formats.includes(format)) &&
+        (discipline === 'all' || i.disciplines.includes(discipline)) &&
+        (!verifiedOnly || i.verified) &&
+        (!kidsOnly || i.kidsSpecialist),
+    );
+    const stat = (i: Instructor) => effStats(i, reviewsByInstructor.get(i.id) ?? []);
+    const sorted = [...filtered];
+    if (sort === 'rating') sorted.sort((a, b) => stat(b).rating - stat(a).rating);
+    else if (sort === 'price') sorted.sort((a, b) => minPrice(a) - minPrice(b));
+    else if (sort === 'career') sorted.sort((a, b) => b.experienceYears - a.experienceYears);
+    // 추천순: 검증·어린이전문·평점·경력 가중 점수
+    else
+      sorted.sort(
+        (a, b) =>
+          (Number(b.verified) * 2 + Number(b.kidsSpecialist) * 2 + stat(b).rating + b.experienceYears * 0.05) -
+          (Number(a.verified) * 2 + Number(a.kidsSpecialist) * 2 + stat(a).rating + a.experienceYears * 0.05),
+      );
+    return sorted;
+  }, [resortId, format, discipline, verifiedOnly, kidsOnly, sort, reviewsByInstructor]);
 
   const openInstructor = (id: string) => {
     setTab('find');
@@ -155,23 +202,42 @@ export function InstructorsPage() {
           </div>
 
           <div className="chip-row">
-            <button className={`chip${format === 'all' ? ' active' : ''}`} onClick={() => setFormat('all')}>전체</button>
+            <button className={`chip${format === 'all' ? ' active' : ''}`} onClick={() => setFormat('all')}>형태 전체</button>
             {FORMATS.map((f) => (
               <button key={f} className={`chip${format === f ? ' active' : ''}`} onClick={() => setFormat(f)}>{f}</button>
             ))}
           </div>
 
-          <div className="inst-sortline">
-            <span>추천순 · 강사 <strong>{list.length}</strong>명</span>
+          <div className="chip-row">
+            <button className={`chip${discipline === 'all' ? ' active' : ''}`} onClick={() => setDiscipline('all')}>종목 전체</button>
+            {DISCIPLINES_F.map((d) => (
+              <button key={d} className={`chip${discipline === d ? ' active' : ''}`} onClick={() => setDiscipline(d)}>{d}</button>
+            ))}
+          </div>
+
+          <div className="inst-toggles">
             <label className="inst-toggle">
               <input type="checkbox" checked={verifiedOnly} onChange={(e) => setVerifiedOnly(e.target.checked)} />
               검증 강사만
             </label>
+            <label className="inst-toggle">
+              <input type="checkbox" checked={kidsOnly} onChange={(e) => setKidsOnly(e.target.checked)} />
+              어린이 전문
+            </label>
+          </div>
+
+          <div className="inst-sortline">
+            <span>강사 <strong>{list.length}</strong>명</span>
+            <select className="inst-sortsel" value={sort} onChange={(e) => setSort(e.target.value as SortKey)}>
+              {SORTS.map((s) => <option key={s.key} value={s.key}>{s.label}</option>)}
+            </select>
           </div>
 
           {list.length === 0 && <p className="calc-hint">조건에 맞는 강사가 없어요. 필터를 바꿔보세요.</p>}
 
-          {list.map((i) => (
+          {list.map((i) => {
+            const st = effStats(i, reviewsByInstructor.get(i.id) ?? []);
+            return (
             <button key={i.id} className="inst-card" onClick={() => setSelectedId(i.id)}>
               <div className="inst-top">
                 <span className="inst-ph" style={{ background: `linear-gradient(150deg, ${i.hue}, #9ec1ff)` }}>
@@ -181,7 +247,7 @@ export function InstructorsPage() {
                 <span className="inst-name">
                   <span className="nm">{i.name}</span>
                   <span className="meta">{RESORT_LABEL(i.resortId)} · 경력 {i.experienceYears}년</span>
-                  <Stars rating={i.rating} count={i.reviewCount} />
+                  <Stars rating={st.rating} count={st.count} />
                 </span>
               </div>
               <Badges i={i} />
@@ -191,7 +257,8 @@ export function InstructorsPage() {
                 <span className="inst-avail">{i.availHint}</span>
               </div>
             </button>
-          ))}
+            );
+          })}
 
           <button className="inst-apply-cta" onClick={() => setShowApply(true)}>
             <span className="ic"><LuGraduationCap /></span>
@@ -223,6 +290,7 @@ function InstructorDetail({
 }) {
   const [booking, setBooking] = useState<LessonProduct | null>(null);
   const userReviews = useReviews(i.id);
+  const st = effStats(i, userReviews);
   const reviews = [
     ...userReviews.map((r) => ({ author: r.author, rating: r.rating, text: r.text })),
     ...i.seedReviews,
@@ -243,7 +311,7 @@ function InstructorDetail({
         <div>
           <div className="inst-name"><span className="nm">{i.name}</span></div>
           <div className="meta">{RESORT_LABEL(i.resortId)} · 경력 {i.experienceYears}년 · 강습 {i.lessonCount}회</div>
-          <Stars rating={i.rating} count={i.reviewCount} />
+          <Stars rating={st.rating} count={st.count} />
         </div>
       </div>
 
@@ -279,7 +347,7 @@ function InstructorDetail({
         <span className="inst-mchip"><LuCalendarDays /> {i.availability}</span>
       </div>
 
-      <h3 className="card-title" style={{ marginTop: 14 }}>후기 <span className="card-subtitle">{i.rating.toFixed(1)} · {i.reviewCount}개</span></h3>
+      <h3 className="card-title" style={{ marginTop: 14 }}>후기 <span className="card-subtitle">{st.rating.toFixed(1)} · {st.count}개</span></h3>
       <div className="inst-reviews">
         {reviews.slice(0, 5).map((r, idx) => (
           <div className="inst-review" key={idx}>
