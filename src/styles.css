@@ -1527,3 +1527,22 @@ body {
 .net-banner svg { flex: none; }
 .net-banner.sync svg { animation: net-spin 1s linear infinite; }
 @keyframes net-spin { to { transform: rotate(360deg); } }
+
+/* 만남 장소 */
+.inst-done-meet {
+  display: flex; align-items: center; gap: 6px;
+  margin-top: 8px; padding: 9px 12px;
+  background: var(--brand-soft); border-radius: 10px;
+  font-size: 0.82rem; font-weight: 600; color: var(--brand);
+}
+.inst-done-meet svg { flex: none; width: 16px; height: 16px; }
+.inst-done-meet span { font-weight: 500; color: var(--ink-soft); font-size: 0.76rem; }
+.lmeet { margin-top: 10px; padding: 10px 12px; background: #f6f9ff; border-radius: 10px; }
+.lmeet-row { display: flex; align-items: flex-start; gap: 7px; font-size: 0.84rem; color: var(--ink); }
+.lmeet-row .ic { color: var(--brand); display: inline-flex; margin-top: 1px; }
+.lmeet-row .ic svg { width: 15px; height: 15px; }
+.lmeet-row b { font-weight: 700; margin-right: 3px; }
+.lmeet-row em { color: var(--ink-soft); font-style: normal; font-size: 0.78rem; }
+.lmeet-tip { margin-top: 6px; font-size: 0.76rem; color: var(--ink-soft); }
+.lmeet-tip a { color: var(--brand); font-weight: 600; text-decoration: none; white-space: nowrap; }
+.lmeet .resort-select { margin-top: 5px; }

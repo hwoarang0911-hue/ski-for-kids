@@ -10,6 +10,7 @@ import {
   type Discipline,
 } from '../data/instructors';
 import { RESORTS } from '../data/resorts';
+import { meetingSpots, defaultMeeting, resortMapUrl } from '../data/meeting';
 import { useAccount } from '../lib/account';
 import { SKILL_SHORT } from '../lib/recommend';
 import {
@@ -48,6 +49,7 @@ import {
   LuFileCheck,
   LuClipboardList,
   LuThumbsUp,
+  LuNavigation,
 } from 'react-icons/lu';
 
 const FORMATS: LessonFormat[] = ['1:1', '소그룹', '그룹', '가족'];
@@ -496,6 +498,7 @@ function BookingSheet({
             <h3>결제 완료 · 예약 요청을 보냈어요</h3>
             <p>{i.name}에게 요청이 전달됐어요. <strong>강사 수락 후 확정</strong>되며, 「내 강습」에서 확인할 수 있어요. 3일 전까지 취소하면 전액 환불돼요.</p>
             <div className="inst-done-sum">{p.title} · {dateLabel} {time} · {total.toLocaleString()}원 결제</div>
+            <div className="inst-done-meet"><LuMapPin /> 만남 예정: {defaultMeeting(i.resortId)} <span>(강사 확정 시 최종 안내)</span></div>
             <button className="btn-primary full" onClick={onBooked}>내 강습에서 보기</button>
           </div>
         ) : step === 'pay' ? (
@@ -606,8 +609,19 @@ function MyLessons({ onRebook }: { onRebook: (instructorId: string) => void }) {
             <div><span className="ic"><LuCalendarDays /></span> {b.date.slice(5).replace('-', '/')} · {b.time}</div>
             <div><span className="ic"><LuMapPin /></span> {RESORT_LABEL(b.resortId)}</div>
             {b.memberNames.length > 0 && <div><span className="ic"><LuUser /></span> {b.memberNames.join(', ')}</div>}
-            <div><span className="ic"><LuClock /></span> {b.priceTotal.toLocaleString()}원</div>
+            <div><span className="ic"><LuClock /></span> {b.priceTotal.toLocaleString()}원{b.payStatus === 'refunded' ? ' · 환불됨' : ''}</div>
           </div>
+          {b.status !== 'cancelled' && b.meetingPoint && (
+            <div className="lmeet">
+              <div className="lmeet-row">
+                <span className="ic"><LuNavigation /></span>
+                <span><b>만남 장소</b> {b.meetingPoint}{b.status === 'requested' && <em> · 강사 확정 후 최종 안내</em>}</span>
+              </div>
+              {seg === 'upcoming' && (
+                <div className="lmeet-tip">도착 10분 전 · 리프트권·장비 지참 · <a href={resortMapUrl(b.resortId, b.meetingPoint)} target="_blank" rel="noopener noreferrer">지도로 열기 ↗</a></div>
+              )}
+            </div>
+          )}
           <div className="lacts">
             {seg === 'upcoming' ? (
               <>
@@ -760,33 +774,50 @@ function InstructorConsole({ onBack }: { onBack: () => void }) {
       )}
 
       {shown.map((b) => (
-        <div className="lcard" key={b.id}>
-          {b.status === 'requested' && <span className="lday">수락 대기 · {ddayLabel(b.date)}</span>}
-          {b.status === 'confirmed' && <span className="lday">확정 · {ddayLabel(b.date)}</span>}
-          {b.status === 'completed' && <span className="lflag done"><LuCheck /> 완료{b.reviewed ? ' · 후기 받음' : ''}</span>}
-          <div className="lt">{b.productTitle}</div>
-          <div className="lm">
-            <div><span className="ic"><LuCalendarDays /></span> {b.date.slice(5).replace('-', '/')} · {b.time}</div>
-            <div><span className="ic"><LuMapPin /></span> {RESORT_LABEL(b.resortId)}</div>
-            {b.memberNames.length > 0 && <div><span className="ic"><LuUser /></span> {b.memberNames.join(', ')}</div>}
-            <div><span className="ic"><LuClock /></span> {b.priceTotal.toLocaleString()}원 · {b.payStatus === 'paid' ? '결제완료' : b.payStatus === 'refunded' ? '환불됨' : '미결제'}</div>
-          </div>
-          {seg === 'requests' && (
-            <div className="lacts">
-              <button className="lbtn gho" onClick={() => cancelBooking(b.id, 'instructor')}>거절</button>
-              <button className="lbtn pri" onClick={() => acceptBooking(b.id)}><LuThumbsUp /> 수락</button>
-            </div>
-          )}
-          {seg === 'scheduled' && (
-            <div className="lacts">
-              <button className="lbtn gho" onClick={() => cancelBooking(b.id, 'instructor')}>취소</button>
-              <button className="lbtn pri" onClick={() => completeBooking(b.id)}><LuCheck /> 강습 완료</button>
-            </div>
-          )}
-        </div>
+        <ConsoleCard key={b.id} b={b} seg={seg} />
       ))}
 
       <p className="data-note">수락·거절·완료는 예약자에게 알림으로 전달돼요. 실서비스에선 강사 본인의 예약만 보이고 정산이 연동됩니다.</p>
+    </div>
+  );
+}
+
+function ConsoleCard({ b, seg }: { b: Booking; seg: 'requests' | 'scheduled' | 'past' }) {
+  const [spot, setSpot] = useState(b.meetingPoint ?? defaultMeeting(b.resortId));
+  return (
+    <div className="lcard">
+      {b.status === 'requested' && <span className="lday">수락 대기 · {ddayLabel(b.date)}</span>}
+      {b.status === 'confirmed' && <span className="lday">확정 · {ddayLabel(b.date)}</span>}
+      {b.status === 'completed' && <span className="lflag done"><LuCheck /> 완료{b.reviewed ? ' · 후기 받음' : ''}</span>}
+      <div className="lt">{b.productTitle}</div>
+      <div className="lm">
+        <div><span className="ic"><LuCalendarDays /></span> {b.date.slice(5).replace('-', '/')} · {b.time}</div>
+        <div><span className="ic"><LuMapPin /></span> {RESORT_LABEL(b.resortId)}</div>
+        {b.memberNames.length > 0 && <div><span className="ic"><LuUser /></span> {b.memberNames.join(', ')}</div>}
+        <div><span className="ic"><LuClock /></span> {b.priceTotal.toLocaleString()}원 · {b.payStatus === 'paid' ? '결제완료' : b.payStatus === 'refunded' ? '환불됨' : '미결제'}</div>
+      </div>
+      {seg === 'requests' ? (
+        <>
+          <div className="lmeet">
+            <div className="inst-flabel" style={{ marginTop: 2 }}>만남 장소 지정</div>
+            <select className="resort-select" value={spot} onChange={(e) => setSpot(e.target.value)}>
+              {meetingSpots(b.resortId).map((s) => <option key={s} value={s}>{s}</option>)}
+            </select>
+          </div>
+          <div className="lacts">
+            <button className="lbtn gho" onClick={() => cancelBooking(b.id, 'instructor')}>거절</button>
+            <button className="lbtn pri" onClick={() => acceptBooking(b.id, spot)}><LuThumbsUp /> 수락</button>
+          </div>
+        </>
+      ) : seg === 'scheduled' ? (
+        <>
+          {b.meetingPoint && <div className="lmeet"><div className="lmeet-row"><span className="ic"><LuNavigation /></span><span><b>만남</b> {b.meetingPoint}</span></div></div>}
+          <div className="lacts">
+            <button className="lbtn gho" onClick={() => cancelBooking(b.id, 'instructor')}>취소</button>
+            <button className="lbtn pri" onClick={() => completeBooking(b.id)}><LuCheck /> 강습 완료</button>
+          </div>
+        </>
+      ) : null}
     </div>
   );
 }

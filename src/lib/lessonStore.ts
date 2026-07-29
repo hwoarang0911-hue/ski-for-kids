@@ -1,10 +1,17 @@
 import { useSyncExternalStore } from 'react';
 import { backend } from './backend';
 import type { Booking, Review, Application, Snapshot } from './backend';
-import { pushNotification } from './notifications';
+import { pushNotification, pushOnce } from './notifications';
+import { defaultMeeting } from '../data/meeting';
 
 function mdLabel(date: string) {
   return date.slice(5).replace('-', '/');
+}
+function daysUntil(date: string): number {
+  const d = new Date(date + 'T00:00:00');
+  const t = new Date();
+  t.setHours(0, 0, 0, 0);
+  return Math.round((d.getTime() - t.getTime()) / 86400000);
 }
 
 /**
@@ -157,12 +164,20 @@ export async function hydrate() {
     }
   }
   void flush(); // 쌓여있던 오프라인 쓰기 전송 시도
+  checkReminders();
 }
 void hydrate();
 
 // ── bookings ────────────────────────────────────────────────
 export function addBooking(draft: Omit<Booking, 'id' | 'status' | 'createdAt'>): Booking {
-  const b: Booking = { ...draft, id: uid(), status: 'requested', payStatus: draft.payStatus ?? 'none', createdAt: Date.now() };
+  const b: Booking = {
+    ...draft,
+    id: uid(),
+    status: 'requested',
+    payStatus: draft.payStatus ?? 'none',
+    meetingPoint: draft.meetingPoint ?? defaultMeeting(draft.resortId),
+    createdAt: Date.now(),
+  };
   bookings = [b, ...bookings];
   cacheSnapshot();
   emit();
@@ -178,12 +193,13 @@ export function updateBooking(id: string, patch: Partial<Booking>) {
   if (next) enqueue('booking', next);
 }
 
-/** 강사가 예약을 수락 → 확정 + 예약자 알림 */
-export function acceptBooking(id: string) {
+/** 강사가 예약을 수락 → 확정 + 예약자 알림 (만남 장소 조정 가능) */
+export function acceptBooking(id: string, meetingPoint?: string) {
   const b = bookings.find((x) => x.id === id);
   if (!b) return;
-  updateBooking(id, { status: 'confirmed' });
-  pushNotification('confirmed', '예약이 확정됐어요 🎉', `${b.instructorName}님이 ${mdLabel(b.date)} ${b.time} 강습을 수락했어요. 「내 강습」에서 확인하세요.`);
+  const spot = meetingPoint ?? b.meetingPoint;
+  updateBooking(id, { status: 'confirmed', meetingPoint: spot });
+  pushNotification('confirmed', '예약이 확정됐어요 🎉', `${b.instructorName}님이 ${mdLabel(b.date)} ${b.time} 강습을 수락했어요. 만남 장소: ${spot}. 「내 강습」에서 확인하세요.`);
 }
 
 /** 예약 취소(예약자/강사). 결제건은 환불 처리 + 알림 */
@@ -205,6 +221,24 @@ export function completeBooking(id: string) {
   if (!b || b.status === 'completed' || b.status === 'cancelled') return;
   updateBooking(id, { status: 'completed' });
   pushNotification('review', '강습은 어떠셨나요?', `${b.instructorName} 강습이 완료됐어요. 다른 가족을 위해 후기를 남겨주세요.`);
+}
+
+/**
+ * 확정된 강습 중 오늘/내일 것을 리마인더 알림으로 안내(1회).
+ * 하이드레이션 직후와 예약 상태 변경 시 호출.
+ */
+export function checkReminders() {
+  for (const b of bookings) {
+    if (b.status !== 'confirmed') continue;
+    const diff = daysUntil(b.date);
+    if (diff !== 0 && diff !== 1) continue;
+    const when = diff === 0 ? '오늘' : '내일';
+    pushOnce(
+      'reminder',
+      `${mdLabel(b.date)} 강습 리마인더`,
+      `${when} ${b.time} ${b.instructorName} 강습이에요. 만남 장소: ${b.meetingPoint ?? '스키장 렌탈샵 앞'}. 리프트권·장비 챙기고 10분 전 도착하세요.`,
+    );
+  }
 }
 
 export function useBookings(): Booking[] {

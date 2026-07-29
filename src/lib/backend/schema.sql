@@ -20,6 +20,7 @@ create table if not exists public.bookings (
   reviewed        boolean default false,
   pay_status      text default 'none',   -- none | paid | refunded (Phase 2)
   pay_id          text,
+  meeting_point   text,                  -- 강습 만남 장소
   created_at      timestamptz default now()
 );
 

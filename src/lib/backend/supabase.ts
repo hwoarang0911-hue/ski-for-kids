@@ -54,6 +54,7 @@ const bookingRow = (b: Booking) => ({
   reviewed: b.reviewed ?? false,
   pay_status: b.payStatus ?? 'none',
   pay_id: b.payId ?? null,
+  meeting_point: b.meetingPoint ?? null,
   created_at: new Date(b.createdAt).toISOString(),
 });
 const toBooking = (r: any): Booking => ({
@@ -72,6 +73,7 @@ const toBooking = (r: any): Booking => ({
   reviewed: r.reviewed,
   payStatus: r.pay_status,
   payId: r.pay_id ?? undefined,
+  meetingPoint: r.meeting_point ?? undefined,
   createdAt: new Date(r.created_at).getTime(),
 });
 

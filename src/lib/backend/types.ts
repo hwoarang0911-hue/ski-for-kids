@@ -25,6 +25,8 @@ export interface Booking {
   /** 결제 상태·식별자 (Phase 2) */
   payStatus?: PaymentStatus;
   payId?: string;
+  /** 강습 만남 장소(스키장 내 집합 지점). 강사가 확정 시 조정 가능 */
+  meetingPoint?: string;
   createdAt: number;
 }
 
