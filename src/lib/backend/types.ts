@@ -19,7 +19,10 @@ export interface Booking {
   productTitle: string;
   date: string; // YYYY-MM-DD
   time: string;
-  memberNames: string[];
+  /** 강습 인원 수(가족 프로필과 무관하게 상황에 맞춰 지정) */
+  headcount: number;
+  /** (구버전 호환) 예전 예약의 구성원 이름 */
+  memberNames?: string[];
   priceTotal: number;
   status: BookingStatus;
   reviewed?: boolean;

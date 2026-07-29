@@ -12,7 +12,6 @@ import {
 import { RESORTS } from '../data/resorts';
 import { meetingSpots, defaultMeeting, resortMapUrl } from '../data/meeting';
 import { useAccount } from '../lib/account';
-import { SKILL_SHORT } from '../lib/recommend';
 import {
   useBookings,
   useReviews,
@@ -437,21 +436,19 @@ function BookingSheet({
   onBooked: () => void;
 }) {
   const dates = useMemo(() => upcomingWeekends(3), []);
+  // 형태별 최대 인원: 1:1은 1명 고정, 나머지는 상품 정원(없으면 4)
+  const maxCount = p.format === '1:1' ? 1 : (p.groupMax ?? 4);
   const [date, setDate] = useState(dates[0]?.key ?? '');
   const [time, setTime] = useState(TIMES[0]);
-  const [picked, setPicked] = useState<string[]>(members[0] ? [members[0].id] : []);
+  const [count, setCount] = useState(() => Math.min(Math.max(1, members.length || 1), maxCount));
   const [step, setStep] = useState<'form' | 'pay'>('form');
   const [paying, setPaying] = useState(false);
   const [payErr, setPayErr] = useState('');
   const [done, setDone] = useState(false);
 
-  const toggleMember = (id: string) =>
-    setPicked((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]));
-
-  const count = Math.max(1, picked.length);
   const total = p.perPerson ? p.priceKRW * count : p.priceKRW;
   const dateLabel = dates.find((d) => d.key === date)?.label ?? '';
-  const payerName = members.find((m) => m.id === picked[0])?.name ?? '고객';
+  const payerName = members[0]?.name ?? '고객';
   const dup = hasActiveBooking(i.id, date, time);
 
   const payAndBook = async () => {
@@ -475,7 +472,7 @@ function BookingSheet({
         productTitle: `${p.title} · ${durLabel(p.durationMin)}`,
         date,
         time,
-        memberNames: picked.map((id) => members.find((m) => m.id === id)?.name ?? '아이'),
+        headcount: count,
         priceTotal: total,
         payStatus: 'paid',
         payId: result.payId,
@@ -511,7 +508,7 @@ function BookingSheet({
             </div>
             <div className="inst-paysum">
               <div className="row"><span>{p.title} · {durLabel(p.durationMin)}</span><b>{p.perPerson ? `${won(p.priceKRW)} × ${count}` : won(p.priceKRW)}</b></div>
-              <div className="row mut"><span>{RESORT_LABEL(i.resortId)} · {dateLabel} {time}</span><span>{picked.length ? `${count}명` : ''}</span></div>
+              <div className="row mut"><span>{RESORT_LABEL(i.resortId)} · {dateLabel} {time}</span><span>{count}명</span></div>
               <div className="row total"><span>결제 금액</span><b>{total.toLocaleString()}원</b></div>
             </div>
             <div className={`inst-paymethod${isLivePayment ? ' live' : ''}`}>
@@ -543,18 +540,19 @@ function BookingSheet({
               ))}
             </div>
 
-            <div className="inst-flabel">강습 받을 아이</div>
-            {members.length === 0 ? (
-              <p className="inst-nomem">가족 탭에서 아이를 등록하면 여기에 자동으로 채워져요.</p>
+            <div className="inst-flabel">인원 수</div>
+            {maxCount === 1 ? (
+              <div className="inst-headfixed"><LuUser /> 1:1 개인 강습 · <b>1명</b></div>
             ) : (
-              <div className="inst-memrow">
-                {members.map((m) => (
-                  <button key={m.id} className={`inst-mem${picked.includes(m.id) ? ' on' : ''}`} onClick={() => toggleMember(m.id)}>
-                    {picked.includes(m.id) && <span className="cb"><LuCheck /></span>}
-                    <span className="mt"><b>{m.name}</b><span>{m.heightCm}㎝ · {SKILL_SHORT[m.level]}</span></span>
-                  </button>
-                ))}
-              </div>
+              <>
+                <div className="inst-stepper">
+                  <button className="stp" onClick={() => setCount((c) => Math.max(1, c - 1))} disabled={count <= 1} aria-label="인원 줄이기">−</button>
+                  <span className="stp-val"><b>{count}</b>명</span>
+                  <button className="stp" onClick={() => setCount((c) => Math.min(maxCount, c + 1))} disabled={count >= maxCount} aria-label="인원 늘리기">+</button>
+                  <span className="stp-max">최대 {maxCount}명{p.perPerson ? ' · 1인당 요금' : ''}</span>
+                </div>
+                <p className="inst-headnote">우리 아이·다른 집 아이 상관없이 <b>참여 인원 수</b>만 맞추면 돼요.</p>
+              </>
             )}
 
             <div className="inst-total">
@@ -563,7 +561,7 @@ function BookingSheet({
             </div>
             <p className="inst-cancel">강습 3일 전까지 무료 취소 · 예약 확정은 강사 수락 후</p>
             {dup && <p className="inst-payerr">이미 {dateLabel} {time}에 이 강사 예약이 있어요. 다른 시간을 선택해주세요.</p>}
-            <button className="btn-primary full" onClick={() => setStep('pay')} disabled={dup || (picked.length === 0 && members.length > 0)}>
+            <button className="btn-primary full" onClick={() => setStep('pay')} disabled={dup}>
               결제하고 예약하기
             </button>
           </>
@@ -611,7 +609,7 @@ function MyLessons({ onRebook }: { onRebook: (instructorId: string) => void }) {
           <div className="lm">
             <div><span className="ic"><LuCalendarDays /></span> {b.date.slice(5).replace('-', '/')} · {b.time}</div>
             <div><span className="ic"><LuMapPin /></span> {RESORT_LABEL(b.resortId)}</div>
-            {b.memberNames.length > 0 && <div><span className="ic"><LuUser /></span> {b.memberNames.join(', ')}</div>}
+            <div><span className="ic"><LuUser /></span> {b.headcount ?? b.memberNames?.length ?? 1}명</div>
             <div><span className="ic"><LuClock /></span> {b.priceTotal.toLocaleString()}원{b.payStatus === 'refunded' ? ' · 환불됨' : ''}</div>
           </div>
           {b.status !== 'cancelled' && b.meetingPoint && (
@@ -799,7 +797,7 @@ function ConsoleCard({ b, seg }: { b: Booking; seg: 'requests' | 'scheduled' | '
       <div className="lm">
         <div><span className="ic"><LuCalendarDays /></span> {b.date.slice(5).replace('-', '/')} · {b.time}</div>
         <div><span className="ic"><LuMapPin /></span> {RESORT_LABEL(b.resortId)}</div>
-        {b.memberNames.length > 0 && <div><span className="ic"><LuUser /></span> {b.memberNames.join(', ')}</div>}
+        <div><span className="ic"><LuUser /></span> {b.headcount ?? b.memberNames?.length ?? 1}명</div>
         <div><span className="ic"><LuClock /></span> {b.priceTotal.toLocaleString()}원 · {b.payStatus === 'paid' ? '결제완료' : b.payStatus === 'refunded' ? '환불됨' : '미결제'}</div>
       </div>
       {seg === 'requests' ? (

@@ -15,7 +15,8 @@ create table if not exists public.bookings (
   product_title   text,
   date            date,
   time            text,
-  member_names    text[] default '{}',
+  headcount       integer default 1,
+  member_names    text[] default '{}',   -- (구버전 호환)
   price_total     integer default 0,
   status          text default 'requested',
   reviewed        boolean default false,

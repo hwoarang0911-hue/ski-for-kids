@@ -1484,6 +1484,23 @@ body {
 .inst-paymethod svg { width: 20px; height: 20px; flex: none; }
 .inst-payerr { color: #d9534f; font-size: 0.82rem; margin: 8px 0 0; }
 
+/* 인원 수 스텝퍼 */
+.inst-stepper { display: flex; align-items: center; gap: 12px; }
+.inst-stepper .stp {
+  width: 40px; height: 40px; flex: none;
+  border: 1.5px solid var(--brand-soft); border-radius: 12px;
+  background: var(--card); color: var(--brand);
+  font-size: 1.3rem; font-weight: 700; line-height: 1; cursor: pointer;
+}
+.inst-stepper .stp:disabled { opacity: 0.35; cursor: default; }
+.inst-stepper .stp-val { font-size: 1rem; color: var(--ink-soft); min-width: 46px; text-align: center; }
+.inst-stepper .stp-val b { font-size: 1.3rem; color: var(--ink); margin-right: 2px; }
+.inst-stepper .stp-max { font-size: 0.76rem; color: var(--ink-soft); margin-left: auto; text-align: right; }
+.inst-headnote { font-size: 0.78rem; color: var(--ink-soft); margin: 8px 2px 0; line-height: 1.45; }
+.inst-headnote b { color: var(--brand); font-weight: 700; }
+.inst-headfixed { display: flex; align-items: center; gap: 7px; font-size: 0.92rem; color: var(--ink); padding: 11px 13px; background: #f6f9ff; border-radius: 12px; }
+.inst-headfixed svg { width: 17px; height: 17px; color: var(--brand); }
+
 /* 신규 강사 배지 */
 .inst-stars.new { font-size: 0.76rem; font-weight: 700; color: #1fa564; background: #dcf5e6; padding: 1px 8px; border-radius: 8px; display: inline-block; }
 
