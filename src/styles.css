@@ -1405,3 +1405,17 @@ body {
 .inst-upload.on { border-style: solid; border-color: var(--brand); color: var(--brand); background: var(--brand-soft); }
 .inst-upload svg { width: 18px; height: 18px; }
 .btn-primary.full:disabled { opacity: 0.45; }
+
+/* 결제 단계 */
+.inst-payhead { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+.inst-payhead h3 { margin: 0; }
+.inst-back.sm { width: 34px; height: 34px; flex: none; }
+.inst-paysum { background: #f6f9ff; border: 1px solid var(--brand-soft); border-radius: 14px; padding: 12px 14px; margin: 4px 0 12px; }
+.inst-paysum .row { display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; color: var(--ink); padding: 3px 0; }
+.inst-paysum .row.mut { font-size: 0.78rem; color: var(--ink-soft); }
+.inst-paysum .row.total { margin-top: 6px; padding-top: 9px; border-top: 1px dashed var(--brand-soft); font-size: 1rem; }
+.inst-paysum .row.total b { color: var(--brand); font-size: 1.12rem; }
+.inst-paymethod { display: flex; align-items: center; gap: 10px; padding: 13px 14px; border: 1.5px solid var(--brand-soft); border-radius: 12px; font-size: 0.9rem; color: var(--ink-soft); }
+.inst-paymethod.live { border-color: var(--brand); color: var(--brand); background: var(--brand-soft); }
+.inst-paymethod svg { width: 20px; height: 20px; flex: none; }
+.inst-payerr { color: #d9534f; font-size: 0.82rem; margin: 8px 0 0; }

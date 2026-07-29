@@ -21,6 +21,7 @@ import {
   useApplications,
   type Booking,
 } from '../lib/lessonStore';
+import { payment, isLivePayment } from '../lib/payment';
 import {
   LuStar,
   LuBadgeCheck,
@@ -34,6 +35,7 @@ import {
   LuClock,
   LuUpload,
   LuGraduationCap,
+  LuCreditCard,
 } from 'react-icons/lu';
 
 const FORMATS: LessonFormat[] = ['1:1', '소그룹', '그룹', '가족'];
@@ -322,6 +324,9 @@ function BookingSheet({
   const [date, setDate] = useState(dates[0]?.key ?? '');
   const [time, setTime] = useState(TIMES[0]);
   const [picked, setPicked] = useState<string[]>(members[0] ? [members[0].id] : []);
+  const [step, setStep] = useState<'form' | 'pay'>('form');
+  const [paying, setPaying] = useState(false);
+  const [payErr, setPayErr] = useState('');
   const [done, setDone] = useState(false);
 
   const toggleMember = (id: string) =>
@@ -329,21 +334,41 @@ function BookingSheet({
 
   const count = Math.max(1, picked.length);
   const total = p.perPerson ? p.priceKRW * count : p.priceKRW;
+  const dateLabel = dates.find((d) => d.key === date)?.label ?? '';
+  const payerName = members.find((m) => m.id === picked[0])?.name ?? '고객';
 
-  const submit = () => {
-    addBooking({
-      instructorId: i.id,
-      instructorName: i.name,
-      instructorHue: i.hue,
-      resortId: i.resortId,
-      productId: p.id,
-      productTitle: `${p.title} · ${durLabel(p.durationMin)}`,
-      date,
-      time,
-      memberNames: picked.map((id) => members.find((m) => m.id === id)?.name ?? '아이'),
-      priceTotal: total,
+  const payAndBook = async () => {
+    setPayErr('');
+    setPaying(true);
+    const orderId = `bk_${Date.now().toString(36)}`;
+    const result = await payment.pay({
+      orderId,
+      amount: total,
+      orderName: `${i.name} · ${p.title}`,
+      customerName: payerName,
     });
-    setDone(true);
+    if (result.ok && result.outcome === 'paid') {
+      addBooking({
+        instructorId: i.id,
+        instructorName: i.name,
+        instructorHue: i.hue,
+        resortId: i.resortId,
+        productId: p.id,
+        productTitle: `${p.title} · ${durLabel(p.durationMin)}`,
+        date,
+        time,
+        memberNames: picked.map((id) => members.find((m) => m.id === id)?.name ?? '아이'),
+        priceTotal: total,
+        payStatus: 'paid',
+        payId: result.payId,
+      });
+      setDone(true);
+    } else if (result.outcome === 'cancelled') {
+      setPayErr('결제가 취소됐어요.');
+    } else {
+      setPayErr(result.message || '결제에 실패했어요. 다시 시도해주세요.');
+    }
+    setPaying(false);
   };
 
   return (
@@ -354,10 +379,31 @@ function BookingSheet({
         {done ? (
           <div className="inst-done">
             <span className="inst-done-ic"><LuCheck /></span>
-            <h3>예약 요청을 보냈어요</h3>
-            <p>{i.name}에게 요청이 전달됐어요. <strong>강사 수락 후 확정</strong>되며, 「내 강습」에서 확인할 수 있어요.</p>
-            <div className="inst-done-sum">{p.title} · {dates.find((d) => d.key === date)?.label} {time}</div>
+            <h3>결제 완료 · 예약 요청을 보냈어요</h3>
+            <p>{i.name}에게 요청이 전달됐어요. <strong>강사 수락 후 확정</strong>되며, 「내 강습」에서 확인할 수 있어요. 3일 전까지 취소하면 전액 환불돼요.</p>
+            <div className="inst-done-sum">{p.title} · {dateLabel} {time} · {total.toLocaleString()}원 결제</div>
             <button className="btn-primary full" onClick={onBooked}>내 강습에서 보기</button>
+          </div>
+        ) : step === 'pay' ? (
+          <div className="inst-pay">
+            <div className="inst-payhead">
+              <button className="inst-back sm" onClick={() => { setStep('form'); setPayErr(''); }} aria-label="뒤로"><LuChevronLeft /></button>
+              <h3>결제하기</h3>
+            </div>
+            <div className="inst-paysum">
+              <div className="row"><span>{p.title} · {durLabel(p.durationMin)}</span><b>{p.perPerson ? `${won(p.priceKRW)} × ${count}` : won(p.priceKRW)}</b></div>
+              <div className="row mut"><span>{RESORT_LABEL(i.resortId)} · {dateLabel} {time}</span><span>{picked.length ? `${count}명` : ''}</span></div>
+              <div className="row total"><span>결제 금액</span><b>{total.toLocaleString()}원</b></div>
+            </div>
+            <div className={`inst-paymethod${isLivePayment ? ' live' : ''}`}>
+              <LuCreditCard />
+              <span>{isLivePayment ? '토스페이먼츠 카드 결제' : '모의 결제 (데모)'}</span>
+            </div>
+            <p className="inst-cancel">강습 3일 전까지 무료 취소·전액 환불 · 결제는 강사 수락 전까지 안전하게 보관돼요.</p>
+            {payErr && <p className="inst-payerr">{payErr}</p>}
+            <button className="btn-primary full" onClick={payAndBook} disabled={paying}>
+              {paying ? '결제 진행 중…' : `${total.toLocaleString()}원 결제하기`}
+            </button>
           </div>
         ) : (
           <>
@@ -397,7 +443,9 @@ function BookingSheet({
               <b>{total.toLocaleString()}원</b>
             </div>
             <p className="inst-cancel">강습 3일 전까지 무료 취소 · 예약 확정은 강사 수락 후</p>
-            <button className="btn-primary full" onClick={submit}>예약 요청 보내기</button>
+            <button className="btn-primary full" onClick={() => setStep('pay')} disabled={picked.length === 0 && members.length > 0}>
+              결제하고 예약하기
+            </button>
           </>
         )}
       </div>
