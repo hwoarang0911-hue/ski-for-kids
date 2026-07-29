@@ -9,6 +9,19 @@ const BK = 'ski-for-kids.bookings';
 const RV = 'ski-for-kids.reviews';
 const AP = 'ski-for-kids.applications';
 
+/**
+ * 테스트/데모용 오프라인 시뮬레이션 훅.
+ * sessionStorage['ski-for-kids.simulateOffline']==='1' 이면 쓰기가 실패해
+ * 아웃박스 재시도 경로(스키장 통신 두절 시나리오)를 검증할 수 있다.
+ */
+function simulateOffline(): boolean {
+  try {
+    return sessionStorage.getItem('ski-for-kids.simulateOffline') === '1';
+  } catch {
+    return false;
+  }
+}
+
 function read<T>(key: string): T[] {
   try {
     const raw = localStorage.getItem(key);
@@ -35,12 +48,15 @@ export const localAdapter: BackendAdapter = {
     };
   },
   async putBooking(b) {
+    if (simulateOffline()) throw new Error('simulated offline');
     upsert(BK, b);
   },
   async putReview(r) {
+    if (simulateOffline()) throw new Error('simulated offline');
     upsert(RV, r);
   },
   async putApplication(a) {
+    if (simulateOffline()) throw new Error('simulated offline');
     upsert(AP, a);
   },
 };

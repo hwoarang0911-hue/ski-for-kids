@@ -21,6 +21,10 @@ import {
   addApplication,
   useApplications,
   updateApplication,
+  cancelBooking,
+  acceptBooking,
+  completeBooking,
+  hasActiveBooking,
   type Booking,
 } from '../lib/lessonStore';
 import type { Application } from '../lib/backend';
@@ -42,6 +46,8 @@ import {
   LuShieldCheck,
   LuPhone,
   LuFileCheck,
+  LuClipboardList,
+  LuThumbsUp,
 } from 'react-icons/lu';
 
 const FORMATS: LessonFormat[] = ['1:1', '소그룹', '그룹', '가족'];
@@ -135,9 +141,12 @@ export function InstructorsPage() {
   const [sort, setSort] = useState<SortKey>('recommend');
   const [showApply, setShowApply] = useState(false);
   const [showAdmin, setShowAdmin] = useState(false);
+  const [showConsole, setShowConsole] = useState(false);
 
   const applications = useApplications();
   const pendingCount = applications.filter((a) => a.status === 'review').length;
+  const allBookings = useBookings();
+  const requestedCount = allBookings.filter((b) => b.status === 'requested').length;
   const allInstructors = useMemo(
     () => [
       ...INSTRUCTORS,
@@ -186,6 +195,7 @@ export function InstructorsPage() {
     setSelectedId(id);
   };
 
+  if (showConsole) return <InstructorConsole onBack={() => setShowConsole(false)} />;
   if (showAdmin) return <AdminPanel applications={applications} onBack={() => setShowAdmin(false)} />;
 
   const selected = allInstructors.find((i) => i.id === selectedId) ?? null;
@@ -288,10 +298,16 @@ export function InstructorsPage() {
             </span>
           </button>
 
-          <button className="inst-admin-link" onClick={() => setShowAdmin(true)}>
-            <LuShieldCheck /> 운영자 · 입점 심사 관리
-            {pendingCount > 0 && <span className="inst-admin-badge">{pendingCount}</span>}
-          </button>
+          <div className="inst-role-links">
+            <button className="inst-admin-link" onClick={() => setShowConsole(true)}>
+              <LuClipboardList /> 강사 · 예약 요청 관리
+              {requestedCount > 0 && <span className="inst-admin-badge">{requestedCount}</span>}
+            </button>
+            <button className="inst-admin-link" onClick={() => setShowAdmin(true)}>
+              <LuShieldCheck /> 운영자 · 입점 심사
+              {pendingCount > 0 && <span className="inst-admin-badge">{pendingCount}</span>}
+            </button>
+          </div>
 
           <p className="data-note">강습·결제는 예시(목업)예요. 실제 서비스에는 강사 검증·결제·취소 정책이 연동됩니다.</p>
         </>
@@ -433,6 +449,7 @@ function BookingSheet({
   const total = p.perPerson ? p.priceKRW * count : p.priceKRW;
   const dateLabel = dates.find((d) => d.key === date)?.label ?? '';
   const payerName = members.find((m) => m.id === picked[0])?.name ?? '고객';
+  const dup = hasActiveBooking(i.id, date, time);
 
   const payAndBook = async () => {
     setPayErr('');
@@ -540,7 +557,8 @@ function BookingSheet({
               <b>{total.toLocaleString()}원</b>
             </div>
             <p className="inst-cancel">강습 3일 전까지 무료 취소 · 예약 확정은 강사 수락 후</p>
-            <button className="btn-primary full" onClick={() => setStep('pay')} disabled={picked.length === 0 && members.length > 0}>
+            {dup && <p className="inst-payerr">이미 {dateLabel} {time}에 이 강사 예약이 있어요. 다른 시간을 선택해주세요.</p>}
+            <button className="btn-primary full" onClick={() => setStep('pay')} disabled={dup || (picked.length === 0 && members.length > 0)}>
               결제하고 예약하기
             </button>
           </>
@@ -577,7 +595,7 @@ function MyLessons({ onRebook }: { onRebook: (instructorId: string) => void }) {
       {shown.map((b) => (
         <div className="lcard" key={b.id}>
           {b.status === 'cancelled' ? (
-            <span className="lflag cancel">취소됨</span>
+            <span className="lflag cancel">취소됨{b.payStatus === 'refunded' ? ' · 환불 완료' : ''}</span>
           ) : b.status === 'completed' ? (
             <span className="lflag done"><LuCheck /> 완료{b.reviewed ? ' · 후기 작성함' : ''}</span>
           ) : (
@@ -593,8 +611,8 @@ function MyLessons({ onRebook }: { onRebook: (instructorId: string) => void }) {
           <div className="lacts">
             {seg === 'upcoming' ? (
               <>
-                <button className="lbtn gho" onClick={() => updateBooking(b.id, { status: 'cancelled' })}>취소</button>
-                <button className="lbtn pri" onClick={() => setReviewFor(b)}>다녀왔어요</button>
+                <button className="lbtn gho" onClick={() => cancelBooking(b.id, 'booker')}>{b.payStatus === 'paid' ? '취소·환불' : '취소'}</button>
+                {b.status === 'confirmed' && <button className="lbtn pri" onClick={() => setReviewFor(b)}>다녀왔어요</button>}
               </>
             ) : (
               <>
@@ -706,6 +724,69 @@ function AdminPanel({ applications, onBack }: { applications: Application[]; onB
       ))}
 
       <p className="data-note">심사 결과는 강사에게 알림으로 전달돼요. 실서비스에선 KSIA 자격 조회·서류 검증이 연동됩니다.</p>
+    </div>
+  );
+}
+
+function InstructorConsole({ onBack }: { onBack: () => void }) {
+  const bookings = useBookings();
+  const [seg, setSeg] = useState<'requests' | 'scheduled' | 'past'>('requests');
+  const t = todayStr();
+
+  const requests = bookings.filter((b) => b.status === 'requested');
+  const scheduled = bookings.filter((b) => b.status === 'confirmed' && b.date >= t);
+  const past = bookings.filter((b) => b.status === 'completed' || (b.status === 'confirmed' && b.date < t));
+  const shown = seg === 'requests' ? requests : seg === 'scheduled' ? scheduled : past;
+
+  return (
+    <div className="page">
+      <div className="inst-dhead">
+        <button className="inst-back" onClick={onBack} aria-label="뒤로"><LuChevronLeft /></button>
+        <h2><LuClipboardList /> 강사 콘솔</h2>
+      </div>
+      <p className="inst-apply-sub">들어온 예약 요청을 수락·거절하고, 강습을 완료 처리합니다. 데모라 모든 강사의 예약이 함께 보여요.</p>
+
+      <div className="chip-row" style={{ marginTop: 4 }}>
+        <button className={`chip${seg === 'requests' ? ' active' : ''}`} onClick={() => setSeg('requests')}>요청 {requests.length}</button>
+        <button className={`chip${seg === 'scheduled' ? ' active' : ''}`} onClick={() => setSeg('scheduled')}>예정 {scheduled.length}</button>
+        <button className={`chip${seg === 'past' ? ' active' : ''}`} onClick={() => setSeg('past')}>완료 {past.length}</button>
+      </div>
+
+      {shown.length === 0 && (
+        <div className="card empty-card">
+          <LuClipboardList size={28} />
+          <p>{seg === 'requests' ? '새 예약 요청이 없어요.' : seg === 'scheduled' ? '예정된 강습이 없어요.' : '완료된 강습이 없어요.'}</p>
+        </div>
+      )}
+
+      {shown.map((b) => (
+        <div className="lcard" key={b.id}>
+          {b.status === 'requested' && <span className="lday">수락 대기 · {ddayLabel(b.date)}</span>}
+          {b.status === 'confirmed' && <span className="lday">확정 · {ddayLabel(b.date)}</span>}
+          {b.status === 'completed' && <span className="lflag done"><LuCheck /> 완료{b.reviewed ? ' · 후기 받음' : ''}</span>}
+          <div className="lt">{b.productTitle}</div>
+          <div className="lm">
+            <div><span className="ic"><LuCalendarDays /></span> {b.date.slice(5).replace('-', '/')} · {b.time}</div>
+            <div><span className="ic"><LuMapPin /></span> {RESORT_LABEL(b.resortId)}</div>
+            {b.memberNames.length > 0 && <div><span className="ic"><LuUser /></span> {b.memberNames.join(', ')}</div>}
+            <div><span className="ic"><LuClock /></span> {b.priceTotal.toLocaleString()}원 · {b.payStatus === 'paid' ? '결제완료' : b.payStatus === 'refunded' ? '환불됨' : '미결제'}</div>
+          </div>
+          {seg === 'requests' && (
+            <div className="lacts">
+              <button className="lbtn gho" onClick={() => cancelBooking(b.id, 'instructor')}>거절</button>
+              <button className="lbtn pri" onClick={() => acceptBooking(b.id)}><LuThumbsUp /> 수락</button>
+            </div>
+          )}
+          {seg === 'scheduled' && (
+            <div className="lacts">
+              <button className="lbtn gho" onClick={() => cancelBooking(b.id, 'instructor')}>취소</button>
+              <button className="lbtn pri" onClick={() => completeBooking(b.id)}><LuCheck /> 강습 완료</button>
+            </div>
+          )}
+        </div>
+      ))}
+
+      <p className="data-note">수락·거절·완료는 예약자에게 알림으로 전달돼요. 실서비스에선 강사 본인의 예약만 보이고 정산이 연동됩니다.</p>
     </div>
   );
 }

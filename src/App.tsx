@@ -9,6 +9,8 @@ import { InstructorsPage } from './pages/InstructorsPage';
 import { Icon, LuUser } from './lib/icons';
 import { useAccount } from './lib/account';
 import { NotificationBell } from './pages/NotificationsPanel';
+import { usePendingWrites, useOnline } from './lib/lessonStore';
+import { LuWifiOff, LuRefreshCw } from 'react-icons/lu';
 
 type TabId = 'home' | 'gear' | 'safety' | 'check' | 'coach' | 'learn';
 
@@ -25,6 +27,8 @@ export default function App() {
   const [tab, setTab] = useState<TabId>('home');
   const [showFamily, setShowFamily] = useState(false);
   const { name } = useAccount();
+  const online = useOnline();
+  const pending = usePendingWrites();
 
   const goTab = (id: TabId) => {
     setTab(id);
@@ -47,6 +51,15 @@ export default function App() {
           </button>
         </div>
       </header>
+
+      {(!online || pending > 0) && (
+        <div className={`net-banner${online ? ' sync' : ''}`}>
+          {online ? <LuRefreshCw size={15} /> : <LuWifiOff size={15} />}
+          {online
+            ? `연결됨 · 저장 대기 ${pending}건 전송 중…`
+            : `오프라인 · 예약·후기는 연결되면 자동으로 전송돼요${pending > 0 ? ` (대기 ${pending}건)` : ''}`}
+        </div>
+      )}
 
       <main className="app-main">
         {showFamily ? (

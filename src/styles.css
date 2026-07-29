@@ -1509,3 +1509,21 @@ body {
 .acard-cert { color: var(--brand); font-weight: 600; }
 .acard-intro { font-size: 0.84rem; color: var(--ink); line-height: 1.5; margin: 9px 0 4px; padding: 9px 11px; background: #f6f9ff; border-radius: 10px; }
 .acard .lacts { margin-top: 12px; }
+
+/* 역할 진입 링크 (강사·운영자) */
+.inst-role-links { display: flex; gap: 8px; margin-top: 10px; }
+.inst-role-links .inst-admin-link { margin-top: 0; flex: 1; }
+
+/* 오프라인/동기화 배너 */
+.net-banner {
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+  margin: 0 14px 6px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-size: 0.78rem; font-weight: 600;
+  background: #ffe9c7; color: #9a6a12;
+}
+.net-banner.sync { background: #dbeafe; color: #1e5bb8; }
+.net-banner svg { flex: none; }
+.net-banner.sync svg { animation: net-spin 1s linear infinite; }
+@keyframes net-spin { to { transform: rotate(360deg); } }
