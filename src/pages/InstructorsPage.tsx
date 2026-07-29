@@ -30,6 +30,8 @@ import {
 } from '../lib/lessonStore';
 import type { Application } from '../lib/backend';
 import { payment, isLivePayment } from '../lib/payment';
+import { ChatSheet } from './ChatSheet';
+import { useUnread, type ChatSender } from '../lib/chat';
 import {
   LuStar,
   LuBadgeCheck,
@@ -50,6 +52,7 @@ import {
   LuClipboardList,
   LuThumbsUp,
   LuNavigation,
+  LuMessageCircle,
 } from 'react-icons/lu';
 
 const FORMATS: LessonFormat[] = ['1:1', '소그룹', '그룹', '가족'];
@@ -119,6 +122,14 @@ function Stars({ rating, count }: { rating: number; count?: number }) {
       <LuStar /> {rating.toFixed(1)}
       {count !== undefined && <span className="c"> ({count})</span>}
     </span>
+  );
+}
+function ChatButton({ booking, role, onOpen }: { booking: Booking; role: ChatSender; onOpen: () => void }) {
+  const unread = useUnread(booking.id, role);
+  return (
+    <button className="lbtn gho chatbtn" onClick={onOpen}>
+      <LuMessageCircle /> 채팅{unread > 0 && <span className="chat-badge">{unread}</span>}
+    </button>
   );
 }
 function Badges({ i }: { i: Instructor }) {
@@ -575,6 +586,7 @@ function MyLessons({ onRebook }: { onRebook: (instructorId: string) => void }) {
   const bookings = useBookings();
   const [seg, setSeg] = useState<'upcoming' | 'past'>('upcoming');
   const [reviewFor, setReviewFor] = useState<Booking | null>(null);
+  const [chatFor, setChatFor] = useState<Booking | null>(null);
   const t = todayStr();
 
   const upcoming = bookings.filter((b) => b.status !== 'cancelled' && b.status !== 'completed' && b.date >= t);
@@ -625,6 +637,7 @@ function MyLessons({ onRebook }: { onRebook: (instructorId: string) => void }) {
           <div className="lacts">
             {seg === 'upcoming' ? (
               <>
+                <ChatButton booking={b} role="booker" onOpen={() => setChatFor(b)} />
                 <button className="lbtn gho" onClick={() => cancelBooking(b.id, 'booker')}>{b.payStatus === 'paid' ? '취소·환불' : '취소'}</button>
                 {b.status === 'confirmed' && <button className="lbtn pri" onClick={() => setReviewFor(b)}>다녀왔어요</button>}
               </>
@@ -647,6 +660,8 @@ function MyLessons({ onRebook }: { onRebook: (instructorId: string) => void }) {
           onDone={() => setReviewFor(null)}
         />
       )}
+
+      {chatFor && <ChatSheet booking={chatFor} role="booker" onClose={() => setChatFor(null)} />}
     </>
   );
 }
@@ -784,6 +799,7 @@ function InstructorConsole({ onBack }: { onBack: () => void }) {
 
 function ConsoleCard({ b, seg }: { b: Booking; seg: 'requests' | 'scheduled' | 'past' }) {
   const [spot, setSpot] = useState(b.meetingPoint ?? defaultMeeting(b.resortId));
+  const [chat, setChat] = useState(false);
   return (
     <div className="lcard">
       {b.status === 'requested' && <span className="lday">수락 대기 · {ddayLabel(b.date)}</span>}
@@ -805,6 +821,7 @@ function ConsoleCard({ b, seg }: { b: Booking; seg: 'requests' | 'scheduled' | '
             </select>
           </div>
           <div className="lacts">
+            <ChatButton booking={b} role="instructor" onOpen={() => setChat(true)} />
             <button className="lbtn gho" onClick={() => cancelBooking(b.id, 'instructor')}>거절</button>
             <button className="lbtn pri" onClick={() => acceptBooking(b.id, spot)}><LuThumbsUp /> 수락</button>
           </div>
@@ -813,11 +830,13 @@ function ConsoleCard({ b, seg }: { b: Booking; seg: 'requests' | 'scheduled' | '
         <>
           {b.meetingPoint && <div className="lmeet"><div className="lmeet-row"><span className="ic"><LuNavigation /></span><span><b>만남</b> {b.meetingPoint}</span></div></div>}
           <div className="lacts">
+            <ChatButton booking={b} role="instructor" onOpen={() => setChat(true)} />
             <button className="lbtn gho" onClick={() => cancelBooking(b.id, 'instructor')}>취소</button>
             <button className="lbtn pri" onClick={() => completeBooking(b.id)}><LuCheck /> 강습 완료</button>
           </div>
         </>
       ) : null}
+      {chat && <ChatSheet booking={b} role="instructor" onClose={() => setChat(false)} />}
     </div>
   );
 }
