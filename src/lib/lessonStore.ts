@@ -1,75 +1,21 @@
 import { useSyncExternalStore } from 'react';
+import { backend } from './backend';
+import type { Booking, Review, Application } from './backend';
 
 /**
- * 예약·후기 데이터 접근 계층.
- * 지금은 localStorage에 저장하지만, 이 파일이 유일한 데이터 소스라서
- * 나중에 여기만 서버(API/Supabase 등)로 교체하면 상용 백엔드로 넘어간다.
- * (컴포넌트는 이 훅들만 쓰고 저장 방식을 모른다 = 백엔드 교체 지점)
+ * 예약·후기·입점신청의 인메모리 뷰모델 + React 훅.
+ * 저장(persistence)은 backend 어댑터에 위임한다(localStorage 또는 Supabase).
+ * 컴포넌트는 이 훅/함수만 쓰고 저장 방식은 모른다.
+ *
+ * 쓰기는 낙관적(optimistic): 메모리를 먼저 갱신·emit 한 뒤 백엔드에 비동기 반영.
+ * 초기에는 backend.loadAll()로 하이드레이션한다.
  */
 
-export type BookingStatus = 'requested' | 'confirmed' | 'cancelled' | 'completed';
+export type { Booking, Review, Application, BookingStatus, PaymentStatus } from './backend';
 
-export interface Booking {
-  id: string;
-  instructorId: string;
-  instructorName: string;
-  instructorHue: string;
-  resortId: string;
-  productId: string;
-  productTitle: string;
-  date: string; // YYYY-MM-DD
-  time: string;
-  memberNames: string[];
-  priceTotal: number;
-  status: BookingStatus;
-  reviewed?: boolean;
-  createdAt: number;
-}
-
-export interface Review {
-  id: string;
-  instructorId: string;
-  author: string;
-  rating: number;
-  text: string;
-  createdAt: number;
-}
-
-export type ApplicationStatus = 'review' | 'approved' | 'rejected';
-
-/** 강사 입점 신청(공급측). 자격 검증 후 노출 대상이 된다. */
-export interface Application {
-  id: string;
-  name: string;
-  phone: string;
-  resortId: string;
-  cert: string;
-  kidsSpecialist: boolean;
-  disciplines: string[];
-  formats: string[];
-  experienceYears: number;
-  intro: string;
-  certFileName: string;
-  status: ApplicationStatus;
-  createdAt: number;
-}
-
-const BK = 'ski-for-kids.bookings';
-const RV = 'ski-for-kids.reviews';
-const AP = 'ski-for-kids.applications';
-
-function load<T>(key: string): T[] {
-  try {
-    const raw = localStorage.getItem(key);
-    return raw ? (JSON.parse(raw) as T[]) : [];
-  } catch {
-    return [];
-  }
-}
-
-let bookings: Booking[] = load<Booking>(BK);
-let reviews: Review[] = load<Review>(RV);
-let applications: Application[] = load<Application>(AP);
+let bookings: Booking[] = [];
+let reviews: Review[] = [];
+let applications: Application[] = [];
 
 const listeners = new Set<() => void>();
 function emit() {
@@ -83,18 +29,37 @@ function uid() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 }
 
+// ── 하이드레이션 ────────────────────────────────────────────
+let hydrated = false;
+export async function hydrate() {
+  if (hydrated) return;
+  hydrated = true;
+  try {
+    const snap = await backend.loadAll();
+    bookings = snap.bookings;
+    reviews = snap.reviews;
+    applications = snap.applications;
+    emit();
+  } catch (e) {
+    console.error('[lessonStore] hydrate 실패:', e);
+  }
+}
+// 모듈 로드 시 즉시 시작
+void hydrate();
+
 // ── bookings ────────────────────────────────────────────────
 export function addBooking(draft: Omit<Booking, 'id' | 'status' | 'createdAt'>): Booking {
-  const b: Booking = { ...draft, id: uid(), status: 'requested', createdAt: Date.now() };
+  const b: Booking = { ...draft, id: uid(), status: 'requested', payStatus: draft.payStatus ?? 'none', createdAt: Date.now() };
   bookings = [b, ...bookings];
-  localStorage.setItem(BK, JSON.stringify(bookings));
   emit();
+  void backend.putBooking(b).catch((e) => console.error('[lessonStore] putBooking:', e));
   return b;
 }
 export function updateBooking(id: string, patch: Partial<Booking>) {
-  bookings = bookings.map((b) => (b.id === id ? { ...b, ...patch } : b));
-  localStorage.setItem(BK, JSON.stringify(bookings));
+  let next: Booking | undefined;
+  bookings = bookings.map((b) => (b.id === id ? (next = { ...b, ...patch }) : b));
   emit();
+  if (next) void backend.putBooking(next).catch((e) => console.error('[lessonStore] putBooking:', e));
 }
 export function useBookings(): Booking[] {
   return useSyncExternalStore(subscribe, () => bookings, () => bookings);
@@ -104,8 +69,8 @@ export function useBookings(): Booking[] {
 export function addReview(draft: Omit<Review, 'id' | 'createdAt'>): Review {
   const r: Review = { ...draft, id: uid(), createdAt: Date.now() };
   reviews = [r, ...reviews];
-  localStorage.setItem(RV, JSON.stringify(reviews));
   emit();
+  void backend.putReview(r).catch((e) => console.error('[lessonStore] putReview:', e));
   return r;
 }
 export function useReviews(instructorId?: string): Review[] {
@@ -117,8 +82,8 @@ export function useReviews(instructorId?: string): Review[] {
 export function addApplication(draft: Omit<Application, 'id' | 'status' | 'createdAt'>): Application {
   const a: Application = { ...draft, id: uid(), status: 'review', createdAt: Date.now() };
   applications = [a, ...applications];
-  localStorage.setItem(AP, JSON.stringify(applications));
   emit();
+  void backend.putApplication(a).catch((e) => console.error('[lessonStore] putApplication:', e));
   return a;
 }
 export function useApplications(): Application[] {
