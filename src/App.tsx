@@ -8,6 +8,7 @@ import { FamilyPage } from './pages/FamilyPage';
 import { InstructorsPage } from './pages/InstructorsPage';
 import { Icon, LuUser } from './lib/icons';
 import { useAccount } from './lib/account';
+import { NotificationBell } from './pages/NotificationsPanel';
 
 type TabId = 'home' | 'gear' | 'safety' | 'check' | 'coach' | 'learn';
 
@@ -34,14 +35,17 @@ export default function App() {
     <div className="app">
       <header className="app-header">
         <h1>키즈스키 <span className="app-tagline">가족 스키 가이드</span></h1>
-        <button
-          className={`header-avatar${showFamily ? ' active' : ''}`}
-          onClick={() => setShowFamily((v) => !v)}
-          aria-label="내 가족 정보"
-          aria-pressed={showFamily}
-        >
-          {name ? <span className="avatar-initial">{name.trim().charAt(0)}</span> : <LuUser size={20} />}
-        </button>
+        <div className="header-actions">
+          <NotificationBell />
+          <button
+            className={`header-avatar${showFamily ? ' active' : ''}`}
+            onClick={() => setShowFamily((v) => !v)}
+            aria-label="내 가족 정보"
+            aria-pressed={showFamily}
+          >
+            {name ? <span className="avatar-initial">{name.trim().charAt(0)}</span> : <LuUser size={20} />}
+          </button>
+        </div>
       </header>
 
       <main className="app-main">

@@ -83,6 +83,68 @@ body {
   font-weight: 800;
 }
 
+.header-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.header-bell {
+  position: relative;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: 1.5px solid var(--brand-soft);
+  background: var(--card);
+  color: var(--brand);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+}
+.bell-badge {
+  position: absolute;
+  top: -3px; right: -3px;
+  min-width: 18px; height: 18px;
+  padding: 0 4px;
+  border-radius: 9px;
+  background: #ff5a5f;
+  color: #fff;
+  font-size: 0.66rem;
+  font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+  border: 2px solid var(--bg);
+}
+
+/* 알림 패널 */
+.noti-modal { position: fixed; inset: 0; z-index: 60; }
+.noti-dim { position: absolute; inset: 0; background: rgba(20, 33, 61, 0.32); }
+.noti-sheet {
+  position: absolute;
+  top: 62px; right: 12px; left: 12px;
+  max-width: 420px; margin-left: auto;
+  max-height: 72vh; overflow-y: auto;
+  background: var(--card);
+  border-radius: 16px;
+  box-shadow: 0 12px 40px rgba(20, 33, 61, 0.22);
+  padding: 6px 6px 10px;
+}
+.noti-head { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px 6px; }
+.noti-head h3 { font-size: 1.05rem; color: var(--ink); }
+.noti-close { border: none; background: none; color: var(--ink-soft); cursor: pointer; padding: 4px; display: flex; }
+.noti-empty { text-align: center; color: var(--ink-soft); padding: 28px 20px; }
+.noti-empty svg { color: var(--brand-soft); margin-bottom: 8px; }
+.noti-empty p { font-size: 0.86rem; line-height: 1.5; }
+.noti-list { display: flex; flex-direction: column; }
+.noti-item { display: flex; gap: 11px; padding: 11px 12px; border-radius: 12px; }
+.noti-item + .noti-item { border-top: 1px solid #eef2f9; }
+.noti-ic {
+  flex: none; width: 36px; height: 36px; border-radius: 10px;
+  display: grid; place-items: center;
+  background: var(--brand-soft); color: var(--brand);
+}
+.noti-ic svg { width: 19px; height: 19px; }
+.noti-item.k-confirmed .noti-ic, .noti-item.k-approved .noti-ic { background: #dcf5e6; color: #1fa564; }
+.noti-item.k-rejected .noti-ic { background: #ffe3e3; color: #d9534f; }
+.noti-item.k-reminder .noti-ic { background: #fff0d6; color: #d9871e; }
+.noti-tx { display: flex; flex-direction: column; gap: 2px; }
+.noti-tx b { font-size: 0.9rem; color: var(--ink); }
+.noti-body { font-size: 0.8rem; color: var(--ink-soft); line-height: 1.45; }
+.noti-time { font-size: 0.72rem; color: #9aa8bf; margin-top: 1px; }
+
 .app-main {
   padding: 8px 14px calc(var(--tab-height) + 24px + env(safe-area-inset-bottom));
 }
@@ -1421,3 +1483,29 @@ body {
 .inst-paymethod.live { border-color: var(--brand); color: var(--brand); background: var(--brand-soft); }
 .inst-paymethod svg { width: 20px; height: 20px; flex: none; }
 .inst-payerr { color: #d9534f; font-size: 0.82rem; margin: 8px 0 0; }
+
+/* 신규 강사 배지 */
+.inst-stars.new { font-size: 0.76rem; font-weight: 700; color: #1fa564; background: #dcf5e6; padding: 1px 8px; border-radius: 8px; display: inline-block; }
+
+/* 운영자 진입 */
+.inst-admin-link {
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+  width: 100%; margin-top: 10px; padding: 11px;
+  border: 1px solid var(--brand-soft); border-radius: 12px;
+  background: transparent; color: var(--ink-soft);
+  font-size: 0.82rem; font-weight: 600; cursor: pointer; font-family: inherit;
+}
+.inst-admin-link svg { width: 16px; height: 16px; }
+.inst-admin-badge { min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: #ff5a5f; color: #fff; font-size: 0.68rem; font-weight: 800; display: grid; place-items: center; }
+
+/* 관리자 심사 카드 */
+.acard { background: var(--card); border-radius: var(--radius); padding: 14px; margin-bottom: 12px; box-shadow: var(--shadow); }
+.acard-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.acard-top b { font-size: 1rem; color: var(--ink); }
+.acard-badges { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.acard-meta { display: flex; flex-direction: column; gap: 5px; font-size: 0.84rem; color: var(--ink-soft); }
+.acard-meta .ic { color: var(--brand); display: inline-flex; margin-right: 5px; vertical-align: -2px; }
+.acard-meta .ic svg { width: 15px; height: 15px; }
+.acard-cert { color: var(--brand); font-weight: 600; }
+.acard-intro { font-size: 0.84rem; color: var(--ink); line-height: 1.5; margin: 9px 0 4px; padding: 9px 11px; background: #f6f9ff; border-radius: 10px; }
+.acard .lacts { margin-top: 12px; }

@@ -1,6 +1,11 @@
 import { useSyncExternalStore } from 'react';
 import { backend } from './backend';
 import type { Booking, Review, Application } from './backend';
+import { pushNotification } from './notifications';
+
+function mdLabel(date: string) {
+  return date.slice(5).replace('-', '/');
+}
 
 /**
  * 예약·후기·입점신청의 인메모리 뷰모델 + React 훅.
@@ -53,6 +58,19 @@ export function addBooking(draft: Omit<Booking, 'id' | 'status' | 'createdAt'>):
   bookings = [b, ...bookings];
   emit();
   void backend.putBooking(b).catch((e) => console.error('[lessonStore] putBooking:', e));
+
+  pushNotification('booking', '예약 요청을 보냈어요', `${b.instructorName}님에게 ${mdLabel(b.date)} ${b.time} 강습 요청이 전달됐어요. 수락을 기다리는 중이에요.`);
+
+  // 데모: 로컬 백엔드에선 강사 수락을 시뮬레이션한다.
+  // (실서비스에선 강사 앱/서버가 confirm 하고 그 이벤트로 알림이 온다)
+  if (backend.name === 'local') {
+    setTimeout(() => {
+      const cur = bookings.find((x) => x.id === b.id);
+      if (!cur || cur.status !== 'requested') return;
+      updateBooking(b.id, { status: 'confirmed' });
+      pushNotification('confirmed', '예약이 확정됐어요 🎉', `${b.instructorName}님이 ${mdLabel(b.date)} ${b.time} 강습을 수락했어요. 「내 강습」에서 확인하세요.`);
+    }, 4000);
+  }
   return b;
 }
 export function updateBooking(id: string, patch: Partial<Booking>) {
@@ -85,6 +103,18 @@ export function addApplication(draft: Omit<Application, 'id' | 'status' | 'creat
   emit();
   void backend.putApplication(a).catch((e) => console.error('[lessonStore] putApplication:', e));
   return a;
+}
+export function updateApplication(id: string, status: Application['status']) {
+  let next: Application | undefined;
+  applications = applications.map((a) => (a.id === id ? (next = { ...a, status }) : a));
+  emit();
+  if (next) {
+    void backend.putApplication(next).catch((e) => console.error('[lessonStore] putApplication:', e));
+    if (status === 'approved')
+      pushNotification('approved', '입점이 승인됐어요 🎉', `${next.name}님, 자격 검증이 완료돼 강사로 노출됩니다. 강습 상품을 등록해보세요.`);
+    else if (status === 'rejected')
+      pushNotification('rejected', '입점 심사 결과 안내', `${next.name}님, 제출 서류 확인이 어려워 이번 심사는 반려됐어요. 자격증을 다시 확인해 신청해주세요.`);
+  }
 }
 export function useApplications(): Application[] {
   return useSyncExternalStore(subscribe, () => applications, () => applications);

@@ -57,6 +57,74 @@ function resortName(id: string): string {
   return RESORTS.find((r) => r.id === id)?.name ?? id;
 }
 
+const APPROVED_HUES = ['#3f7bff', '#1fa564', '#e0821e', '#8a5bff', '#5b6bff'];
+
+/** 입점 신청(승인 대상)의 최소 필드 */
+export interface ApprovableApplication {
+  id: string;
+  name: string;
+  resortId: string;
+  cert: string;
+  kidsSpecialist: boolean;
+  disciplines: string[];
+  formats: string[];
+  experienceYears: number;
+  intro: string;
+}
+
+/** 형태별 기본 강습 상품(가격 가이드) — 승인 강사의 초기 상품 */
+function defaultProducts(formats: LessonFormat[], disc: Discipline): LessonProduct[] {
+  const out: LessonProduct[] = [];
+  if (formats.includes('1:1'))
+    out.push({ id: 'p1', title: '1:1 강습', format: '1:1', discipline: disc, durationMin: 120, priceKRW: 120000, includesLift: false });
+  if (formats.includes('소그룹'))
+    out.push({ id: 'p2', title: '소그룹 (2~3)', format: '소그룹', discipline: disc, groupMax: 3, durationMin: 120, priceKRW: 70000, perPerson: true });
+  if (formats.includes('그룹'))
+    out.push({ id: 'p3', title: '그룹 강습', format: '그룹', discipline: disc, groupMax: 5, durationMin: 120, priceKRW: 50000, perPerson: true });
+  if (formats.includes('가족'))
+    out.push({ id: 'p4', title: '가족 반나절', format: '가족', discipline: disc, groupMax: 4, durationMin: 240, priceKRW: 350000 });
+  if (out.length === 0)
+    out.push({ id: 'p1', title: '1:1 강습', format: '1:1', discipline: disc, durationMin: 120, priceKRW: 120000, includesLift: false });
+  return out;
+}
+
+/**
+ * 승인된 입점 신청 → 강사 목록에 노출할 Instructor로 변환.
+ * 신규라 평점·후기는 0, "신규 강사" 훅으로 표시한다.
+ */
+export function applicationToInstructor(a: ApprovableApplication): Instructor {
+  const disciplines = (a.disciplines.length ? a.disciplines : ['입문·기초']) as Discipline[];
+  const formats = (a.formats.length ? a.formats : ['1:1']) as LessonFormat[];
+  return {
+    id: `app-${a.id}`,
+    name: a.name,
+    hue: APPROVED_HUES[Math.abs(hashCode(a.id)) % APPROVED_HUES.length],
+    resortId: a.resortId,
+    cert: a.cert as CertLevel,
+    verified: true,
+    kidsSpecialist: a.kidsSpecialist,
+    firstAid: false,
+    experienceYears: a.experienceYears,
+    lessonCount: 0,
+    rating: 0,
+    reviewCount: 0,
+    disciplines,
+    formats,
+    availability: '예약제',
+    availHint: '신규 강사',
+    intro: a.intro || '새로 합류한 강사입니다. 첫 강습을 예약해보세요.',
+    awards: [`KSIA ${a.cert}`],
+    products: defaultProducts(formats, disciplines[0]),
+    seedReviews: [],
+  };
+}
+
+function hashCode(s: string): number {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = (h << 5) - h + s.charCodeAt(i);
+  return h;
+}
+
 export const INSTRUCTORS: Instructor[] = [
   {
     id: 'kim-dohyun',

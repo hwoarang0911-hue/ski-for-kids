@@ -2,6 +2,7 @@ import { useMemo, useState, type Dispatch, type SetStateAction } from 'react';
 import {
   INSTRUCTORS,
   RESORT_LABEL,
+  applicationToInstructor,
   type Instructor,
   type LessonProduct,
   type LessonFormat,
@@ -19,8 +20,10 @@ import {
   addReview,
   addApplication,
   useApplications,
+  updateApplication,
   type Booking,
 } from '../lib/lessonStore';
+import type { Application } from '../lib/backend';
 import { payment, isLivePayment } from '../lib/payment';
 import {
   LuStar,
@@ -36,6 +39,9 @@ import {
   LuUpload,
   LuGraduationCap,
   LuCreditCard,
+  LuShieldCheck,
+  LuPhone,
+  LuFileCheck,
 } from 'react-icons/lu';
 
 const FORMATS: LessonFormat[] = ['1:1', '소그룹', '그룹', '가족'];
@@ -99,6 +105,7 @@ const SORTS: { key: SortKey; label: string }[] = [
 const DISCIPLINES_F: Discipline[] = ['입문·기초', '인터스키', '레이싱', '모글·프리', '스노보드'];
 
 function Stars({ rating, count }: { rating: number; count?: number }) {
+  if (count === 0) return <span className="inst-stars new">신규 강사</span>;
   return (
     <span className="inst-stars">
       <LuStar /> {rating.toFixed(1)}
@@ -127,6 +134,17 @@ export function InstructorsPage() {
   const [kidsOnly, setKidsOnly] = useState(false);
   const [sort, setSort] = useState<SortKey>('recommend');
   const [showApply, setShowApply] = useState(false);
+  const [showAdmin, setShowAdmin] = useState(false);
+
+  const applications = useApplications();
+  const pendingCount = applications.filter((a) => a.status === 'review').length;
+  const allInstructors = useMemo(
+    () => [
+      ...INSTRUCTORS,
+      ...applications.filter((a) => a.status === 'approved').map(applicationToInstructor),
+    ],
+    [applications],
+  );
 
   const allReviews = useReviews();
   const reviewsByInstructor = useMemo(() => {
@@ -140,7 +158,7 @@ export function InstructorsPage() {
   }, [allReviews]);
 
   const list = useMemo(() => {
-    const filtered = INSTRUCTORS.filter(
+    const filtered = allInstructors.filter(
       (i) =>
         (resortId === 'all' || i.resortId === resortId) &&
         (format === 'all' || i.formats.includes(format)) &&
@@ -161,14 +179,16 @@ export function InstructorsPage() {
           (Number(a.verified) * 2 + Number(a.kidsSpecialist) * 2 + stat(a).rating + a.experienceYears * 0.05),
       );
     return sorted;
-  }, [resortId, format, discipline, verifiedOnly, kidsOnly, sort, reviewsByInstructor]);
+  }, [allInstructors, resortId, format, discipline, verifiedOnly, kidsOnly, sort, reviewsByInstructor]);
 
   const openInstructor = (id: string) => {
     setTab('find');
     setSelectedId(id);
   };
 
-  const selected = INSTRUCTORS.find((i) => i.id === selectedId) ?? null;
+  if (showAdmin) return <AdminPanel applications={applications} onBack={() => setShowAdmin(false)} />;
+
+  const selected = allInstructors.find((i) => i.id === selectedId) ?? null;
   if (selected)
     return (
       <InstructorDetail
@@ -195,7 +215,7 @@ export function InstructorsPage() {
             <label htmlFor="inst-resort">스키장</label>
             <select id="inst-resort" className="resort-select" value={resortId} onChange={(e) => setResortId(e.target.value)}>
               <option value="all">전체 스키장</option>
-              {RESORTS.filter((r) => INSTRUCTORS.some((i) => i.resortId === r.id)).map((r) => (
+              {RESORTS.filter((r) => allInstructors.some((i) => i.resortId === r.id)).map((r) => (
                 <option key={r.id} value={r.id}>{r.name}</option>
               ))}
             </select>
@@ -266,6 +286,11 @@ export function InstructorsPage() {
               <b>강사이신가요? 입점 신청</b>
               <span>자격 검증 후 가족·어린이 강습 강사로 노출돼요</span>
             </span>
+          </button>
+
+          <button className="inst-admin-link" onClick={() => setShowAdmin(true)}>
+            <LuShieldCheck /> 운영자 · 입점 심사 관리
+            {pendingCount > 0 && <span className="inst-admin-badge">{pendingCount}</span>}
           </button>
 
           <p className="data-note">강습·결제는 예시(목업)예요. 실제 서비스에는 강사 검증·결제·취소 정책이 연동됩니다.</p>
@@ -347,17 +372,21 @@ function InstructorDetail({
         <span className="inst-mchip"><LuCalendarDays /> {i.availability}</span>
       </div>
 
-      <h3 className="card-title" style={{ marginTop: 14 }}>후기 <span className="card-subtitle">{st.rating.toFixed(1)} · {st.count}개</span></h3>
+      <h3 className="card-title" style={{ marginTop: 14 }}>후기 <span className="card-subtitle">{st.count > 0 ? `${st.rating.toFixed(1)} · ${st.count}개` : '신규'}</span></h3>
       <div className="inst-reviews">
-        {reviews.slice(0, 5).map((r, idx) => (
-          <div className="inst-review" key={idx}>
-            <div className="rv-top">
-              <b>{r.author}</b>
-              <span className="inst-stars sm">{Array.from({ length: r.rating }).map((_, k) => <LuStar key={k} />)}</span>
+        {reviews.length === 0 ? (
+          <p className="calc-hint">아직 후기가 없어요. 첫 강습의 주인공이 되어보세요.</p>
+        ) : (
+          reviews.slice(0, 5).map((r, idx) => (
+            <div className="inst-review" key={idx}>
+              <div className="rv-top">
+                <b>{r.author}</b>
+                <span className="inst-stars sm">{Array.from({ length: r.rating }).map((_, k) => <LuStar key={k} />)}</span>
+              </div>
+              <p>{r.text}</p>
             </div>
-            <p>{r.text}</p>
-          </div>
-        ))}
+          ))
+        )}
       </div>
 
       <p className="data-note">예약·결제는 예시(목업)예요.</p>
@@ -618,6 +647,65 @@ function ReviewModal({ booking: b, onClose, onDone }: { booking: Booking; onClos
         <textarea className="rv-text" rows={3} value={text} onChange={(e) => setText(e.target.value)} placeholder="아이가 어땠는지 남겨주세요 (선택)" />
         <button className="btn-primary full" onClick={submit}>후기 등록</button>
       </div>
+    </div>
+  );
+}
+
+function AdminPanel({ applications, onBack }: { applications: Application[]; onBack: () => void }) {
+  const [seg, setSeg] = useState<'review' | 'done'>('review');
+  const pending = applications.filter((a) => a.status === 'review');
+  const done = applications.filter((a) => a.status !== 'review');
+  const shown = seg === 'review' ? pending : done;
+
+  return (
+    <div className="page">
+      <div className="inst-dhead">
+        <button className="inst-back" onClick={onBack} aria-label="뒤로"><LuChevronLeft /></button>
+        <h2><LuShieldCheck /> 입점 심사</h2>
+      </div>
+      <p className="inst-apply-sub">제출된 강사 자격을 검증하고 승인/반려합니다. 승인 시 강사 찾기 목록에 노출돼요.</p>
+
+      <div className="chip-row" style={{ marginTop: 4 }}>
+        <button className={`chip${seg === 'review' ? ' active' : ''}`} onClick={() => setSeg('review')}>심사 대기 {pending.length}</button>
+        <button className={`chip${seg === 'done' ? ' active' : ''}`} onClick={() => setSeg('done')}>처리 완료 {done.length}</button>
+      </div>
+
+      {shown.length === 0 && (
+        <div className="card empty-card">
+          <LuFileCheck size={28} />
+          <p>{seg === 'review' ? '심사 대기 중인 신청이 없어요.' : '처리한 신청이 없어요.'}</p>
+        </div>
+      )}
+
+      {shown.map((a) => (
+        <div className="acard" key={a.id}>
+          <div className="acard-top">
+            <b>{a.name}</b>
+            {a.status === 'approved' && <span className="lflag done"><LuCheck /> 승인</span>}
+            {a.status === 'rejected' && <span className="lflag cancel">반려</span>}
+            {a.status === 'review' && <span className="lday">심사 대기</span>}
+          </div>
+          <div className="acard-badges">
+            <span className="ibg"><LuBadgeCheck /> KSIA {a.cert}</span>
+            {a.kidsSpecialist && <span className="ibg kid">어린이 전문</span>}
+          </div>
+          <div className="acard-meta">
+            <div><span className="ic"><LuMapPin /></span> {RESORT_LABEL(a.resortId)} · 경력 {a.experienceYears}년</div>
+            <div><span className="ic"><LuPhone /></span> {a.phone}</div>
+            <div><span className="ic"><LuGraduationCap /></span> {a.disciplines.join('·')} / {a.formats.join('·')}</div>
+            <div className="acard-cert"><span className="ic"><LuFileCheck /></span> 자격증: {a.certFileName}</div>
+          </div>
+          {a.intro && <p className="acard-intro">{a.intro}</p>}
+          {a.status === 'review' && (
+            <div className="lacts">
+              <button className="lbtn gho" onClick={() => updateApplication(a.id, 'rejected')}>반려</button>
+              <button className="lbtn pri" onClick={() => updateApplication(a.id, 'approved')}><LuBadgeCheck /> 승인</button>
+            </div>
+          )}
+        </div>
+      ))}
+
+      <p className="data-note">심사 결과는 강사에게 알림으로 전달돼요. 실서비스에선 KSIA 자격 조회·서류 검증이 연동됩니다.</p>
     </div>
   );
 }
