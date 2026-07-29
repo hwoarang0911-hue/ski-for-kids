@@ -1,10 +1,12 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type Dispatch, type SetStateAction } from 'react';
 import {
   INSTRUCTORS,
   RESORT_LABEL,
   type Instructor,
   type LessonProduct,
   type LessonFormat,
+  type CertLevel,
+  type Discipline,
 } from '../data/instructors';
 import { RESORTS } from '../data/resorts';
 import { useAccount } from '../lib/account';
@@ -15,6 +17,8 @@ import {
   addBooking,
   updateBooking,
   addReview,
+  addApplication,
+  useApplications,
   type Booking,
 } from '../lib/lessonStore';
 import {
@@ -28,9 +32,13 @@ import {
   LuAward,
   LuCalendarDays,
   LuClock,
+  LuUpload,
+  LuGraduationCap,
 } from 'react-icons/lu';
 
 const FORMATS: LessonFormat[] = ['1:1', '소그룹', '그룹', '가족'];
+const CERTS: CertLevel[] = ['티칭', '레벨1', '레벨2', '레벨3', '데몬'];
+const DISCIPLINES: Discipline[] = ['입문·기초', '인터스키', '레이싱', '모글·프리', '스노보드'];
 const won = (n: number) => `${(n / 10000).toLocaleString()}만원`;
 const todayStr = () => new Date().toISOString().slice(0, 10);
 
@@ -93,6 +101,7 @@ export function InstructorsPage() {
   const [resortId, setResortId] = useState<string>('all');
   const [format, setFormat] = useState<LessonFormat | 'all'>('all');
   const [verifiedOnly, setVerifiedOnly] = useState(true);
+  const [showApply, setShowApply] = useState(false);
 
   const list = useMemo(
     () =>
@@ -182,9 +191,19 @@ export function InstructorsPage() {
             </button>
           ))}
 
+          <button className="inst-apply-cta" onClick={() => setShowApply(true)}>
+            <span className="ic"><LuGraduationCap /></span>
+            <span className="tx">
+              <b>강사이신가요? 입점 신청</b>
+              <span>자격 검증 후 가족·어린이 강습 강사로 노출돼요</span>
+            </span>
+          </button>
+
           <p className="data-note">강습·결제는 예시(목업)예요. 실제 서비스에는 강사 검증·결제·취소 정책이 연동됩니다.</p>
         </>
       )}
+
+      {showApply && <ApplySheet onClose={() => setShowApply(false)} />}
     </div>
   );
 }
@@ -254,7 +273,7 @@ function InstructorDetail({
       </div>
 
       <div className="inst-meta">
-        <span className="inst-mchip"><LuMapPin /> {RESORT_LABEL(i.resortId)}리조트</span>
+        <span className="inst-mchip"><LuMapPin /> {RESORT_LABEL(i.resortId)}</span>
         <span className="inst-mchip"><LuCalendarDays /> {i.availability}</span>
       </div>
 
@@ -422,7 +441,7 @@ function MyLessons({ onRebook }: { onRebook: (instructorId: string) => void }) {
           <div className="lt">{b.productTitle} — {b.instructorName}</div>
           <div className="lm">
             <div><span className="ic"><LuCalendarDays /></span> {b.date.slice(5).replace('-', '/')} · {b.time}</div>
-            <div><span className="ic"><LuMapPin /></span> {RESORT_LABEL(b.resortId)}리조트</div>
+            <div><span className="ic"><LuMapPin /></span> {RESORT_LABEL(b.resortId)}</div>
             {b.memberNames.length > 0 && <div><span className="ic"><LuUser /></span> {b.memberNames.join(', ')}</div>}
             <div><span className="ic"><LuClock /></span> {b.priceTotal.toLocaleString()}원</div>
           </div>
@@ -482,6 +501,119 @@ function ReviewModal({ booking: b, onClose, onDone }: { booking: Booking; onClos
         <div className="inst-flabel">한 줄 후기</div>
         <textarea className="rv-text" rows={3} value={text} onChange={(e) => setText(e.target.value)} placeholder="아이가 어땠는지 남겨주세요 (선택)" />
         <button className="btn-primary full" onClick={submit}>후기 등록</button>
+      </div>
+    </div>
+  );
+}
+
+function ApplySheet({ onClose }: { onClose: () => void }) {
+  const apps = useApplications();
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [resortId, setResortId] = useState(RESORTS[0]?.id ?? '');
+  const [cert, setCert] = useState<CertLevel>('레벨1');
+  const [kids, setKids] = useState(true);
+  const [disc, setDisc] = useState<Discipline[]>(['입문·기초']);
+  const [fmts, setFmts] = useState<LessonFormat[]>(['1:1']);
+  const [years, setYears] = useState('');
+  const [intro, setIntro] = useState('');
+  const [certFile, setCertFile] = useState('');
+  const [done, setDone] = useState(false);
+
+  const toggle = <T,>(v: T, set: Dispatch<SetStateAction<T[]>>) =>
+    set((s) => (s.includes(v) ? s.filter((x) => x !== v) : [...s, v]));
+
+  const valid = name.trim() && phone.trim() && certFile && disc.length > 0 && fmts.length > 0;
+
+  const submit = () => {
+    if (!valid) return;
+    addApplication({
+      name: name.trim(),
+      phone: phone.trim(),
+      resortId,
+      cert,
+      kidsSpecialist: kids,
+      disciplines: disc,
+      formats: fmts,
+      experienceYears: Number(years) || 0,
+      intro: intro.trim(),
+      certFileName: certFile,
+    });
+    setDone(true);
+  };
+
+  const mine = apps[0];
+
+  return (
+    <div className="inst-modal" role="dialog" aria-modal="true">
+      <div className="inst-dim" onClick={onClose} />
+      <div className="inst-sheet tall">
+        <div className="inst-grip" />
+        {done ? (
+          <div className="inst-done">
+            <span className="inst-done-ic"><LuCheck /></span>
+            <h3>입점 신청이 접수됐어요</h3>
+            <p><strong>자격 검증</strong> 후 강사 목록에 노출돼요. 검토 결과는 등록하신 연락처로 안내드려요.</p>
+            {mine && <div className="inst-done-sum">{mine.name} · KSIA {mine.cert} · {RESORT_LABEL(mine.resortId)} · 심사 중</div>}
+            <button className="btn-primary full" onClick={onClose}>확인</button>
+          </div>
+        ) : (
+          <>
+            <h3>강사 입점 신청</h3>
+            <p className="inst-apply-sub">가족·어린이 강습에 강한 강사님을 찾고 있어요. 자격을 검증해 믿을 수 있는 강사만 노출합니다.</p>
+
+            <div className="inst-flabel">이름</div>
+            <input className="inst-input" value={name} onChange={(e) => setName(e.target.value)} placeholder="실명" />
+
+            <div className="inst-flabel">연락처</div>
+            <input className="inst-input" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="010-0000-0000" inputMode="tel" />
+
+            <div className="inst-flabel">활동 스키장</div>
+            <select className="resort-select" value={resortId} onChange={(e) => setResortId(e.target.value)}>
+              {RESORTS.map((r) => <option key={r.id} value={r.id}>{r.name}</option>)}
+            </select>
+
+            <div className="inst-flabel">KSIA 자격</div>
+            <div className="inst-dchips">
+              {CERTS.map((c) => (
+                <button key={c} className={`inst-dc${cert === c ? ' on' : ''}`} onClick={() => setCert(c)}>{c}</button>
+              ))}
+            </div>
+
+            <div className="inst-flabel">전문 종목</div>
+            <div className="inst-dchips wrap">
+              {DISCIPLINES.map((d) => (
+                <button key={d} className={`inst-dc${disc.includes(d) ? ' on' : ''}`} onClick={() => toggle(d, setDisc)}>{d}</button>
+              ))}
+            </div>
+
+            <div className="inst-flabel">강습 형태</div>
+            <div className="inst-dchips">
+              {FORMATS.map((f) => (
+                <button key={f} className={`inst-dc${fmts.includes(f) ? ' on' : ''}`} onClick={() => toggle(f, setFmts)}>{f}</button>
+              ))}
+            </div>
+
+            <label className="inst-check">
+              <input type="checkbox" checked={kids} onChange={(e) => setKids(e.target.checked)} />
+              어린이·유아 강습 전문
+            </label>
+
+            <div className="inst-flabel">경력 (년)</div>
+            <input className="inst-input" value={years} onChange={(e) => setYears(e.target.value.replace(/\D/g, ''))} placeholder="예: 8" inputMode="numeric" />
+
+            <div className="inst-flabel">한 줄 소개</div>
+            <textarea className="rv-text" rows={2} value={intro} onChange={(e) => setIntro(e.target.value)} placeholder="가족·아이 강습 스타일을 소개해주세요" />
+
+            <div className="inst-flabel">자격증 인증</div>
+            <button className={`inst-upload${certFile ? ' on' : ''}`} onClick={() => setCertFile('KSIA_자격증.jpg')}>
+              <LuUpload /> {certFile ? certFile : '자격증 사진 업로드'}
+            </button>
+
+            <button className="btn-primary full" onClick={submit} disabled={!valid}>입점 신청하기</button>
+            <p className="inst-cancel">제출한 자격은 KSIA 조회로 검증되며, 허위 시 노출이 제한됩니다.</p>
+          </>
+        )}
       </div>
     </div>
   );

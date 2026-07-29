@@ -54,7 +54,7 @@ export interface Instructor {
 }
 
 function resortName(id: string): string {
-  return RESORTS.find((r) => r.id === id)?.name.split(' ')[0] ?? id;
+  return RESORTS.find((r) => r.id === id)?.name ?? id;
 }
 
 export const INSTRUCTORS: Instructor[] = [

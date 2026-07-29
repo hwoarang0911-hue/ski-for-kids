@@ -35,8 +35,28 @@ export interface Review {
   createdAt: number;
 }
 
+export type ApplicationStatus = 'review' | 'approved' | 'rejected';
+
+/** 강사 입점 신청(공급측). 자격 검증 후 노출 대상이 된다. */
+export interface Application {
+  id: string;
+  name: string;
+  phone: string;
+  resortId: string;
+  cert: string;
+  kidsSpecialist: boolean;
+  disciplines: string[];
+  formats: string[];
+  experienceYears: number;
+  intro: string;
+  certFileName: string;
+  status: ApplicationStatus;
+  createdAt: number;
+}
+
 const BK = 'ski-for-kids.bookings';
 const RV = 'ski-for-kids.reviews';
+const AP = 'ski-for-kids.applications';
 
 function load<T>(key: string): T[] {
   try {
@@ -49,6 +69,7 @@ function load<T>(key: string): T[] {
 
 let bookings: Booking[] = load<Booking>(BK);
 let reviews: Review[] = load<Review>(RV);
+let applications: Application[] = load<Application>(AP);
 
 const listeners = new Set<() => void>();
 function emit() {
@@ -90,4 +111,16 @@ export function addReview(draft: Omit<Review, 'id' | 'createdAt'>): Review {
 export function useReviews(instructorId?: string): Review[] {
   const all = useSyncExternalStore(subscribe, () => reviews, () => reviews);
   return instructorId ? all.filter((r) => r.instructorId === instructorId) : all;
+}
+
+// ── applications (강사 입점 신청) ─────────────────────────────
+export function addApplication(draft: Omit<Application, 'id' | 'status' | 'createdAt'>): Application {
+  const a: Application = { ...draft, id: uid(), status: 'review', createdAt: Date.now() };
+  applications = [a, ...applications];
+  localStorage.setItem(AP, JSON.stringify(applications));
+  emit();
+  return a;
+}
+export function useApplications(): Application[] {
+  return useSyncExternalStore(subscribe, () => applications, () => applications);
 }

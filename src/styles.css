@@ -1387,3 +1387,21 @@ body {
 .rv-star.on { color: #f0a92e; }
 .rv-star.on svg { fill: #f0a92e; }
 .rv-text { width: 100%; font-size: 0.9rem; border: 1.5px solid var(--brand-soft); border-radius: 12px; padding: 11px 12px; background: #fbfdff; color: var(--ink); resize: none; font-family: inherit; }
+
+/* 강사 입점 신청 (공급측) */
+.inst-apply-cta { display: flex; align-items: center; gap: 12px; width: 100%; margin-top: 14px; padding: 14px 16px; border: 1.5px dashed var(--brand-soft); border-radius: var(--radius); background: var(--card); text-align: left; cursor: pointer; }
+.inst-apply-cta .ic { display: grid; place-items: center; width: 40px; height: 40px; flex: none; border-radius: 12px; background: var(--brand-soft); color: var(--brand); }
+.inst-apply-cta .ic svg { width: 22px; height: 22px; }
+.inst-apply-cta .tx { display: flex; flex-direction: column; gap: 2px; }
+.inst-apply-cta .tx b { font-size: 0.92rem; color: var(--ink); }
+.inst-apply-cta .tx span { font-size: 0.76rem; color: var(--ink-soft); }
+.inst-sheet.tall { max-height: 88vh; overflow-y: auto; }
+.inst-apply-sub { font-size: 0.82rem; color: var(--ink-soft); line-height: 1.5; margin: 2px 0 4px; }
+.inst-input { width: 100%; font-size: 0.92rem; border: 1.5px solid var(--brand-soft); border-radius: 12px; padding: 11px 12px; background: #fbfdff; color: var(--ink); font-family: inherit; }
+.inst-dchips.wrap { flex-wrap: wrap; }
+.inst-check { display: flex; align-items: center; gap: 8px; margin-top: 12px; font-size: 0.86rem; color: var(--ink); }
+.inst-check input { width: 18px; height: 18px; accent-color: var(--brand); }
+.inst-upload { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 12px; border: 1.5px dashed var(--brand-soft); border-radius: 12px; background: #fbfdff; color: var(--ink-soft); font-size: 0.88rem; cursor: pointer; font-family: inherit; }
+.inst-upload.on { border-style: solid; border-color: var(--brand); color: var(--brand); background: var(--brand-soft); }
+.inst-upload svg { width: 18px; height: 18px; }
+.btn-primary.full:disabled { opacity: 0.45; }
