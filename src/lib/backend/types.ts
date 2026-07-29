@@ -13,6 +13,7 @@ export interface Booking {
   instructorId: string;
   instructorName: string;
   instructorHue: string;
+  instructorPhone?: string;
   resortId: string;
   productId: string;
   productTitle: string;

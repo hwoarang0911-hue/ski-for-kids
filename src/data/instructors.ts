@@ -30,6 +30,8 @@ export interface Instructor {
   name: string;
   /** 강사 대표 색(아바타 그라디언트용) */
   hue: string;
+  /** 확정 후 연락처(전화) */
+  phone: string;
   resortId: string;
   cert: CertLevel;
   /** 자격 검증 완료 여부 */
@@ -63,6 +65,7 @@ const APPROVED_HUES = ['#3f7bff', '#1fa564', '#e0821e', '#8a5bff', '#5b6bff'];
 export interface ApprovableApplication {
   id: string;
   name: string;
+  phone: string;
   resortId: string;
   cert: string;
   kidsSpecialist: boolean;
@@ -99,6 +102,7 @@ export function applicationToInstructor(a: ApprovableApplication): Instructor {
     id: `app-${a.id}`,
     name: a.name,
     hue: APPROVED_HUES[Math.abs(hashCode(a.id)) % APPROVED_HUES.length],
+    phone: a.phone,
     resortId: a.resortId,
     cert: a.cert as CertLevel,
     verified: true,
@@ -130,6 +134,7 @@ export const INSTRUCTORS: Instructor[] = [
     id: 'kim-dohyun',
     name: '김도현 코치',
     hue: '#3f7bff',
+    phone: '010-2412-3801',
     resortId: 'yongpyong',
     cert: '레벨2',
     verified: true,
@@ -159,6 +164,7 @@ export const INSTRUCTORS: Instructor[] = [
     id: 'lee-seoyeon',
     name: '이서연 데몬',
     hue: '#5b6bff',
+    phone: '010-5533-7712',
     resortId: 'high1',
     cert: '데몬',
     verified: true,
@@ -186,6 +192,7 @@ export const INSTRUCTORS: Instructor[] = [
     id: 'park-junho',
     name: '박준호 코치',
     hue: '#1fa564',
+    phone: '010-3390-1185',
     resortId: 'yongpyong',
     cert: '레벨1',
     verified: true,
@@ -214,6 +221,7 @@ export const INSTRUCTORS: Instructor[] = [
     id: 'choi-eunji',
     name: '최은지 코치',
     hue: '#e0821e',
+    phone: '010-8817-2043',
     resortId: 'phoenix',
     cert: '레벨2',
     verified: true,
@@ -241,6 +249,7 @@ export const INSTRUCTORS: Instructor[] = [
     id: 'jung-minsu',
     name: '정민수 코치',
     hue: '#8a5bff',
+    phone: '010-6620-4498',
     resortId: 'muju',
     cert: '레벨3',
     verified: true,

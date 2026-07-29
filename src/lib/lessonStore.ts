@@ -215,14 +215,6 @@ export function cancelBooking(id: string, actor: 'booker' | 'instructor') {
   }
 }
 
-/** 채팅에서 약속(장소/시간)이 확정됨 → 예약 반영 + 알림 */
-export function setMeetingFromChat(bookingId: string, place: string, time?: string) {
-  const b = bookings.find((x) => x.id === bookingId);
-  if (!b) return;
-  updateBooking(bookingId, { meetingPoint: place, ...(time ? { time } : {}) });
-  pushNotification('confirmed', '약속 장소가 정해졌어요', `${mdLabel(b.date)} ${time ?? b.time} · ${place}에서 만나요.`);
-}
-
 /** 강사가 강습 완료 처리 → 후기 요청 알림 */
 export function completeBooking(id: string) {
   const b = bookings.find((x) => x.id === id);

@@ -9,6 +9,7 @@ create table if not exists public.bookings (
   instructor_id   text not null,
   instructor_name text not null,
   instructor_hue  text,
+  instructor_phone text,
   resort_id       text,
   product_id      text,
   product_title   text,
